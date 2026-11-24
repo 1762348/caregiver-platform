@@ -1,0 +1,19 @@
+# 本地开发环境：默认连接本机 MySQL 8
+# 生产环境请通过环境变量覆盖，不要使用这里的默认口令
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/caregiver_platform?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 5000
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.youhu.caregiver: debug
