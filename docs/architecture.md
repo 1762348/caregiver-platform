@@ -53,6 +53,19 @@ com.youhu.caregiver
 5. **幂等**：支付回调按 `payment_no` 去重，取消/完成接口校验前置状态
 6. **审计**：订单状态流转写入 `order_status_logs`，支付结果写入 `payment_records`
 
+## 认证与授权
+
+- **登录**：手机号 + 短信验证码；未注册自动创建 `USER` 账号。开发环境由 `MockSmsSender` 输出固定验证码
+- **令牌**：HS256 JWT，默认 7 天；claims 包含 `sub`（用户 ID）、`role`、`perms`、`phone`
+- **鉴权**：`JwtAuthenticationFilter` 解析令牌并写入 `SecurityContext`；
+  `ROLE_<角色>` 与权限码同时作为 authority，接口可用 `hasRole` / `hasAuthority` 控制
+- **无状态**：不创建 Session，便于水平扩展；令牌续签走 `POST /api/v1/auth/refresh`
+- **统一错误**：未登录 401、权限不足 403，均返回 `ApiResponse` JSON，避免前端拿到 HTML 错误页
+- **公开接口**：登录相关、`/api/v1/meta`、Actuator 健康检查、CORS 预检
+
+> 验证码目前存于单机内存（`SmsCodeService`），多实例部署时需替换为 Redis；
+> 生产环境必须关闭固定验证码，并实现真实短信服务商适配器。
+
 ## 数据模型
 
 已落地 12 张表（设计文档 10 张 + 2 张审计扩展），完整字段与 ER 图见 [数据库说明](database.md)：

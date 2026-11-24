@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
+import { useAuthStore } from '@/stores/auth'
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
@@ -45,11 +47,21 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
-router.beforeEach((to) => {
-  const token = localStorage.getItem('youhu_token')
-  if (to.meta.requiresAuth && !token) {
+router.beforeEach(async (to) => {
+  const auth = useAuthStore()
+
+  if (auth.isLoggedIn && !auth.user) {
+    await auth.ensureLoaded()
+  }
+
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
+
+  if (to.name === 'login' && auth.isLoggedIn) {
+    return { path: '/' }
+  }
+
   return true
 })
 

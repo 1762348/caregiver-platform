@@ -3,13 +3,18 @@
     <header class="home__header">
       <div>
         <p class="home__eyebrow">优护 · 社区护工</p>
-        <h1 class="home__title">{{ greeting }}{{ auth.isLoggedIn ? '，欢迎回来' : '，您好' }}</h1>
+        <h1 class="home__title">{{ greeting }}{{ auth.user?.name ? '，' + auth.user.name : '，您好' }}</h1>
         <p class="home__subtitle">
-          {{ auth.isLoggedIn ? '今日也要照顾好自己和家人' : '让专业照护离家人更近一步' }}
+          {{
+            auth.isLoggedIn
+              ? `${auth.roleLabel} · ${maskPhone(auth.user?.phone ?? '')}`
+              : '让专业照护离家人更近一步'
+          }}
         </p>
       </div>
       <router-link class="home__avatar" :to="auth.isLoggedIn ? '/profile' : '/login'">
-        <van-icon name="user-o" size="22" />
+        <span v-if="auth.isLoggedIn">{{ avatarInitial }}</span>
+        <van-icon v-else name="user-o" size="22" />
       </router-link>
     </header>
 
@@ -72,18 +77,25 @@
       </div>
     </div>
 
-    <p class="home__footnote">P0 基建阶段 · 登录、预约、支付等接口将在后续阶段逐步接入</p>
+    <p class="home__footnote">P2 已完成登录鉴权 · 预约、支付与服务进度将在后续阶段接入</p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { showToast } from 'vant'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { fetchServerMeta, type ServerMeta } from '@/api/meta'
 import { useAuthStore } from '@/stores/auth'
+import { maskPhone } from '@/utils/format'
 
 const auth = useAuthStore()
+
+const avatarInitial = computed(() => {
+  const name = auth.user?.name?.trim()
+  if (name) return name.slice(0, 1)
+  return auth.user?.phone?.slice(-2) ?? '优'
+})
 
 const services = [
   { name: '日常照料', desc: '饮食起居', icon: 'friends-o' },
@@ -161,6 +173,8 @@ onMounted(loadMeta)
   place-items: center;
   width: 44px;
   height: 44px;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--yh-primary);
   text-decoration: none;
   background: var(--yh-primary-light);

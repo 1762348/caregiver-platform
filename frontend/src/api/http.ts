@@ -31,6 +31,16 @@ http.interceptors.response.use(
     return response
   },
   (error) => {
+    const status = error?.response?.status
+    if (status === 401) {
+      localStorage.removeItem(TOKEN_KEY)
+      if (!window.location.pathname.startsWith('/login')) {
+        const redirect = encodeURIComponent(
+          window.location.pathname + window.location.search,
+        )
+        window.location.assign(`/login?redirect=${redirect}`)
+      }
+    }
     const message: string =
       error?.response?.data?.message ?? error?.message ?? '网络异常，请稍后重试'
     return Promise.reject(new Error(message))

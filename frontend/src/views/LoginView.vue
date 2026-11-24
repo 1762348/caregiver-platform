@@ -33,6 +33,7 @@
                 type="primary"
                 plain
                 :disabled="counting"
+                :loading="sending"
                 @click.prevent="sendCode"
               >
                 {{ codeButtonText }}
@@ -42,15 +43,30 @@
         </van-cell-group>
 
         <div class="login__actions">
-          <van-button block round type="primary" native-type="submit">登录 / 注册</van-button>
+          <van-button
+            block
+            round
+            type="primary"
+            native-type="submit"
+            :loading="submitting"
+          >
+            登录 / 注册
+          </van-button>
           <router-link class="login__back" to="/">先随便看看</router-link>
         </div>
       </van-form>
+    </div>
 
-      <p class="login__notice">
-        <van-icon name="info-o" />
-        P0 基建阶段：登录接口将在 P2 接入，当前页面用于确认布局与表单校验
-      </p>
+    <div class="login__demo">
+      <p class="login__demo-title">演示账号（开发环境验证码固定 123456）</p>
+      <div class="login__demo-chips">
+        <button type="button" class="demo-chip" @click="fillDemo('13800000002')">
+          用户 · 13800000002
+        </button>
+        <button type="button" class="demo-chip" @click="fillDemo('13800000000')">
+          管理员 · 13800000000
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -58,14 +74,25 @@
 <script setup lang="ts">
 import { showToast } from 'vant'
 import { computed, onBeforeUnmount, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+const router = useRouter()
+const route = useRoute()
 
 const phone = ref('')
 const code = ref('')
 const seconds = ref(0)
+const sending = ref(false)
+const submitting = ref(false)
 let timer: ReturnType<typeof setInterval> | undefined
 
 const counting = computed(() => seconds.value > 0)
-const codeButtonText = computed(() => (counting.value ? `${seconds.value}s 后重发` : '获取验证码'))
+const codeButtonText = computed(() =>
+  counting.value ? `${seconds.value}s 后重发` : '获取验证码',
+)
 
 const phoneRules = [
   { required: true, message: '请输入手机号' },
@@ -77,24 +104,46 @@ const codeRules = [
   { pattern: /^\d{6}$/, message: '验证码为 6 位数字' },
 ]
 
-function sendCode() {
+function fillDemo(value: string) {
+  phone.value = value
+}
+
+async function sendCode() {
   if (!/^1[3-9]\d{9}$/.test(phone.value)) {
     showToast('请先输入正确的手机号')
     return
   }
-  showToast('短信服务将在 P2 接入')
-  seconds.value = 60
-  timer = setInterval(() => {
-    seconds.value -= 1
-    if (seconds.value <= 0 && timer) {
-      clearInterval(timer)
-      timer = undefined
-    }
-  }, 1000)
+  sending.value = true
+  try {
+    await auth.sendCode(phone.value)
+    showToast('验证码已发送')
+    seconds.value = 60
+    timer = setInterval(() => {
+      seconds.value -= 1
+      if (seconds.value <= 0 && timer) {
+        clearInterval(timer)
+        timer = undefined
+      }
+    }, 1000)
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : '验证码发送失败')
+  } finally {
+    sending.value = false
+  }
 }
 
-function onSubmit() {
-  showToast('登录接口将在 P2 接入')
+async function onSubmit() {
+  submitting.value = true
+  try {
+    await auth.login(phone.value, code.value)
+    showToast('登录成功')
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    await router.replace(redirect)
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : '登录失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onBeforeUnmount(() => {
@@ -106,10 +155,10 @@ onBeforeUnmount(() => {
 .login {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   justify-content: center;
   min-height: 100vh;
-  padding: 32px 20px 56px;
+  padding: 32px 20px 40px;
   background:
     radial-gradient(120% 60% at 50% 0%, #cffafe 0%, rgba(207, 250, 254, 0) 70%),
     var(--yh-bg);
@@ -166,14 +215,35 @@ onBeforeUnmount(() => {
   text-decoration: none;
 }
 
-.login__notice {
-  display: flex;
-  gap: 6px;
-  align-items: flex-start;
-  padding: 0 16px;
-  margin: 8px 0 0;
+.login__demo {
+  padding: 14px 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px dashed var(--yh-border);
+  border-radius: var(--yh-radius-md);
+}
+
+.login__demo-title {
+  margin: 0 0 10px;
   font-size: 12px;
-  line-height: 1.6;
-  color: #94a3b8;
+  color: var(--yh-text-secondary);
+}
+
+.login__demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.demo-chip {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--yh-primary);
+  cursor: pointer;
+  background: var(--yh-primary-light);
+  border: none;
+  border-radius: 999px;
 }
 </style>

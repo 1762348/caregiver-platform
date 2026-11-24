@@ -73,3 +73,18 @@
 | 13800000002 | USER | 张三 |
 
 排班与订单不预置：排班依赖具体日期，由管理端生成（P5）；订单由业务产生。
+
+## 9. Spring Boot 4 的两个迁移注意点
+
+Boot 4 对自动配置做了模块化拆分，踩到两处坑，记录避免后续重复：
+
+- **Flyway**：只引 `flyway-core` 不会触发迁移，需要额外引入 `org.springframework.boot:spring-boot-flyway`
+- **Jackson**：默认序列化器已升级为 Jackson 3（`tools.jackson.databind.ObjectMapper`），
+  Security 的 401/403 响应处理器必须注入 Jackson 3 的 `ObjectMapper`，注入 Jackson 2 会启动失败
+
+## 10. 认证实现说明
+
+- 令牌使用 HS256，密钥从 `JWT_SECRET` 读取，启动时校验至少 32 字节，避免弱密钥
+- 权限码在登录时查库并写入 JWT 的 `perms` 声明；权限调整后需重新登录才会生效（当前取舍，后续可改为按请求加载）
+- 验证码存于单机内存（`SmsCodeService`），多实例部署需迁移到 Redis
+- 开发环境固定验证码由 `app.sms.fixed-code` 控制，生产必须置空

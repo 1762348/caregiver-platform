@@ -21,19 +21,20 @@
 ## 界面预览
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="300" alt="首页" />
-  <img src="docs/screenshots/login.png" width="300" alt="登录" />
+  <img src="docs/screenshots/home.png" width="255" alt="首页" />
+  <img src="docs/screenshots/login.png" width="255" alt="登录" />
+  <img src="docs/screenshots/profile.png" width="255" alt="个人中心" />
 </p>
 
 ## 当前进度
 
-> 正在按阶段推进：**P0 基建 + P1 数据层已完成**，业务接口尚未接入，请勿用于生产。
+> 正在按阶段推进：**P0 基建、P1 数据层、P2 认证授权已完成**，业务接口尚未接入，请勿用于生产。
 
 | 阶段 | 内容 | 状态 |
 | --- | --- | --- |
 | P0 | 仓库骨架、前后端工程、统一响应、CI、基础文档 | ✅ |
 | P1 | 数据库迁移（12 张表）、实体与仓库、种子数据 | ✅ |
-| P2 | 认证授权：JWT、短信验证码、三角色权限 | ⬜ |
+| P2 | 认证授权：JWT、短信验证码、三角色权限、登录页联调 | ✅ |
 | P3 | 核心业务：排班、预约、支付、取消、进度、消息 | ⬜ |
 | P4 | 用户端完整页面 | ⬜ |
 | P5 | 护工端 + 管理后台 | ⬜ |
@@ -46,7 +47,7 @@
 
 | 层 | 选型 |
 | --- | --- |
-| 后端 | Java 17 · Spring Boot 4 · Spring Data JPA · Flyway · Bean Validation |
+| 后端 | Java 17 · Spring Boot 4 · Spring Data JPA · Spring Security + JWT · Flyway · Bean Validation |
 | 数据库 | MySQL 8（开发/生产）· H2 MySQL 模式（测试） |
 | 前端 | Vue 3 · TypeScript · Vite · Pinia · Vue Router · Vant 4 · Axios |
 | 测试 | JUnit 5 · Mockito · MockMvc · Vitest |
@@ -122,7 +123,7 @@ curl http://localhost:8080/api/v1/meta
 | 13800000003 | 护工 | 王芳 CG0002 |
 | 13800000002 | 普通用户 | 张三 |
 
-> 验证码：P2 将实现开发环境固定验证码 `123456` 的短信 Mock，可通过配置关闭。
+> 开发环境验证码固定为 `123456`（`app.sms.fixed-code`）；生产环境请将 `SMS_FIXED_CODE` 置空并接入真实短信服务。
 
 ### 3. 启动前端
 
@@ -158,11 +159,12 @@ cd frontend && npm run test:unit     # Vitest
 
 ## 文档
 
+- [接口文档](docs/api.md)
 - [架构说明](docs/architecture.md)
 - [数据库说明与 ER 图](docs/database.md)
 - [设计决策记录](docs/design-decisions.md)
 - [开发路线图](docs/roadmap.md)
-- 接口文档：P2 接入 springdoc 后提供 `/swagger-ui.html`
+- OpenAPI（Swagger UI）：P6 接入 springdoc 后提供 `/swagger-ui.html`
 
 ## 说明与边界
 
