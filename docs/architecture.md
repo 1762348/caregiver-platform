@@ -44,14 +44,16 @@ com.youhu.caregiver
 - **Repository** 只做数据访问，不包含业务判断
 - 对外统一返回 `ApiResponse<T>`，异常由 `GlobalExceptionHandler` 转换
 
-## 关键业务设计（P3 落地）
+## 关键业务设计（已落地）
 
-1. **名额原子扣减**：`UPDATE caregiver_schedules SET remaining_quota = remaining_quota - 1 WHERE id = ? AND remaining_quota > 0`，受影响行数为 0 即失败，杜绝超卖
-2. **订单状态机**：`PENDING_PAYMENT → PAID → IN_SERVICE → COMPLETED`，`PENDING_PAYMENT → CANCELLED`，非法流转直接拒绝
-3. **支付超时**：下单 30 分钟未支付自动取消并释放名额（定时任务 + 查询时惰性补偿）
-4. **取消规则**：服务开始前 2 小时免费取消；2 小时内收取 20% 手续费；开始后不可取消
-5. **幂等**：支付回调按 `payment_no` 去重，取消/完成接口校验前置状态
+1. **名额原子扣减**：`UPDATE caregiver_schedules SET remaining_quota = remaining_quota - 1 WHERE id = ? AND remaining_quota > 0`，受影响行数为 0 即失败，杜绝超卖（`ScheduleQuotaTest` 覆盖）
+2. **订单状态机**：`PENDING_PAYMENT → PAID → IN_SERVICE → COMPLETED`，`PENDING_PAYMENT / PAID → CANCELLED`，非法流转直接拒绝
+3. **支付超时**：下单 30 分钟未支付，定时任务自动取消并释放名额；支付接口也会校验是否超时
+4. **取消规则**：服务开始前 2 小时免费取消；2 小时内收取 20% 手续费；开始后不可取消。已支付订单退款写支付流水，未支付订单只释放名额
+5. **幂等**：支付回调按 `payment_no` 去重；取消/进度接口校验前置状态，重复操作返回 409
 6. **审计**：订单状态流转写入 `order_status_logs`，支付结果写入 `payment_records`
+7. **服务进度**：护工按“出发 → 到达 → 开始 → 完成”顺序更新，用户侧由时间戳派生 `stage`（待出发/路上/已到达/服务中/已完成/已取消）
+8. **消息**：预约、支付、取消与进度节点写入站内消息，支持未读数与已读状态
 
 ## 认证与授权
 
@@ -61,7 +63,7 @@ com.youhu.caregiver
   `ROLE_<角色>` 与权限码同时作为 authority，接口可用 `hasRole` / `hasAuthority` 控制
 - **无状态**：不创建 Session，便于水平扩展；令牌续签走 `POST /api/v1/auth/refresh`
 - **统一错误**：未登录 401、权限不足 403，均返回 `ApiResponse` JSON，避免前端拿到 HTML 错误页
-- **公开接口**：登录相关、`/api/v1/meta`、Actuator 健康检查、CORS 预检
+- **公开接口**：登录相关、目录查询（类别/护工/排班）、支付回调、`/api/v1/meta`、Actuator 健康检查、CORS 预检
 
 > 验证码目前存于单机内存（`SmsCodeService`），多实例部署时需替换为 Redis；
 > 生产环境必须关闭固定验证码，并实现真实短信服务商适配器。
@@ -88,5 +90,7 @@ com.youhu.caregiver
 ## 非目标
 
 - 不做真实支付清结算（仅适配器 + 回调流程）
-- 不做即时通讯，服务进度采用轮询（30s）而非 WebSocket
+- 不做即时通讯，服务进度采用轮询（30 秒）而非 WebSocket
 - 不在本期实现评价体系与优惠券
+
+> 支付与短信为可替换的 Mock 适配器；上线前需完成资质申请、压测与安全评估。

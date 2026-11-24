@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <p class="home__footnote">P2 已完成登录鉴权 · 预约、支付与服务进度将在后续阶段接入</p>
+    <p class="home__footnote">P3 核心业务已就绪 · 预约、支付与服务进度页面将在 P4 接入</p>
   </div>
 </template>
 

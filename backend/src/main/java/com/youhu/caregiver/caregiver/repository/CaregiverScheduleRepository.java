@@ -4,6 +4,7 @@ import com.youhu.caregiver.caregiver.domain.CaregiverSchedule;
 import com.youhu.caregiver.caregiver.domain.ScheduleStatus;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,6 +24,13 @@ public interface CaregiverScheduleRepository extends JpaRepository<CaregiverSche
 
     boolean existsByCaregiverIdAndServiceDateAndStartTime(
             Long caregiverId, LocalDate serviceDate, LocalTime startTime);
+
+    List<CaregiverSchedule> findByServiceDateAndStatusAndRemainingQuotaGreaterThanOrderByStartTimeAsc(
+            LocalDate serviceDate, ScheduleStatus status, int remainingQuota);
+
+    List<CaregiverSchedule> findByCaregiverIdInAndServiceDateAndStatusAndRemainingQuotaGreaterThanOrderByStartTimeAsc(
+            Collection<Long> caregiverIds, LocalDate serviceDate, ScheduleStatus status,
+            int remainingQuota);
 
     /**
      * 原子扣减名额：只有 remaining_quota {@code > 0} 时才会成功，返回 0 表示已被抢光。

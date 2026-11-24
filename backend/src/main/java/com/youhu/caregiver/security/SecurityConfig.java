@@ -50,6 +50,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/sms-code", "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/payments/callback").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/categories/**", "/api/v1/caregivers/**",
+                                "/api/v1/schedules/**").permitAll()
                         .requestMatchers("/api/v1/meta", "/actuator/health", "/actuator/info",
                                 "/error").permitAll()
                         .anyRequest().authenticated())

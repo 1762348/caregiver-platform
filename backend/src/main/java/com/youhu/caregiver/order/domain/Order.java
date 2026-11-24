@@ -61,4 +61,24 @@ public class Order extends AuditableEntity {
 
     @Column(name = "cancel_time")
     private LocalDateTime cancelTime;
+
+    /** 护工出发时间 */
+    @Column(name = "departed_at")
+    private LocalDateTime departedAt;
+
+    /** 护工到达时间 */
+    @Column(name = "arrived_at")
+    private LocalDateTime arrivedAt;
+
+    /** 开始服务时间 */
+    @Column(name = "started_at")
+    private LocalDateTime startedAt;
+
+    /** 服务完成时间 */
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    /** 取消原因 */
+    @Column(name = "cancel_reason", length = 255)
+    private String cancelReason;
 }

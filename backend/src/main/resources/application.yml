@@ -38,6 +38,9 @@ app:
     max-attempts: 5
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174}
+  payment:
+    # Mock 支付回调签名密钥；接入真实网关后由渠道密钥替代
+    mock-secret: ${MOCK_PAYMENT_SECRET:mock-payment-secret}
 
 server:
   port: ${SERVER_PORT:8080}

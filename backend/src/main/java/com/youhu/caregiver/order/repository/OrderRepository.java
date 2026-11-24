@@ -32,4 +32,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     /** 支付超时扫描：创建时间早于 deadline 的待支付订单 */
     List<Order> findByStatusAndCreatedAtBefore(OrderStatus status, LocalDateTime deadline);
+
+    boolean existsByReceiverId(Long receiverId);
+
+    long countByScheduleId(Long scheduleId);
 }

@@ -21,4 +21,6 @@ public interface CaregiverRepository extends JpaRepository<Caregiver, Long> {
     List<Caregiver> findByCategoryIdAndStatus(Long categoryId, RecordStatus status);
 
     Page<Caregiver> findByStatus(RecordStatus status, Pageable pageable);
+
+    Page<Caregiver> findByCategoryIdAndStatus(Long categoryId, RecordStatus status, Pageable pageable);
 }

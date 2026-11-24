@@ -126,9 +126,139 @@
 | 13800000003 | CAREGIVER | 王芳 |
 | 13800000002 | USER | 张三 |
 
+## 服务目录（公开）
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/categories` | 启用中的服务类别，按基础价格升序 |
+| `GET /api/v1/caregivers?categoryId=&page=0&size=10` | 护工分页列表，可按类别筛选 |
+| `GET /api/v1/caregivers/{id}` | 护工详情（资质、简介、评分） |
+| `GET /api/v1/schedules?categoryId=&date=2026-12-01` | 指定日期可预约排班，过滤已满/已开始 |
+
+排班项示例：
+
+```json
+{
+  "id": 2,
+  "caregiverId": 1,
+  "caregiverName": "李秀兰",
+  "categoryId": 1,
+  "categoryName": "日常照料",
+  "serviceDate": "2026-12-01",
+  "startTime": "08:00",
+  "endTime": "12:00",
+  "timeRange": "08:00-12:00",
+  "remainingQuota": 3,
+  "totalQuota": 3,
+  "price": 200.00
+}
+```
+
+## 被照顾人（需登录）
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/receivers` | 我的被照顾人列表 |
+| `POST /api/v1/receivers` | 新增（最多 10 人，身份证唯一） |
+| `PUT /api/v1/receivers/{id}` | 修改 |
+| `DELETE /api/v1/receivers/{id}` | 删除（存在订单时拒绝） |
+
+请求体：
+
+```json
+{
+  "name": "张三",
+  "idCard": "50010119900101123X",
+  "phone": "13800138000",
+  "relation": "本人",
+  "health": "高血压",
+  "special": "低盐饮食"
+}
+```
+
+身份证会校验 18 位与校验位，并自动解析性别、出生日期。
+
+## 订单（需登录）
+
+| 接口 | 说明 |
+| --- | --- |
+| `POST /api/v1/orders` | 预约下单，锁定名额，返回待支付订单 |
+| `GET /api/v1/orders?status=&page=0&size=10` | 我的订单（可按状态筛选） |
+| `GET /api/v1/orders/{id}` | 订单详情（含服务进度） |
+| `POST /api/v1/orders/{id}/pay` | 支付，`{"channel":"WECHAT"}` / `ALIPAY` / `MOCK` |
+| `POST /api/v1/orders/{id}/cancel` | 取消，`{"reason":"临时有事"}`，返回退款金额 |
+
+下单请求：
+
+```json
+{ "scheduleId": 2, "receiverId": 1 }
+```
+
+订单状态与用户可见阶段：
+
+| status | 含义 | stage（派生） |
+| --- | --- | --- |
+| `PENDING_PAYMENT` | 待支付（30 分钟内有效） | `PENDING_PAYMENT` |
+| `PAID` | 已支付，等待服务 | `PENDING_DEPARTURE` / `ON_THE_WAY` / `ARRIVED` |
+| `IN_SERVICE` | 服务中 | `IN_SERVICE` |
+| `COMPLETED` | 已完成 | `COMPLETED` |
+| `CANCELLED` | 已取消 | `CANCELLED` |
+
+取消退款规则：
+
+- 服务开始前 2 小时以上：全额退款
+- 服务开始前 2 小时内：退还 80%（收取 20% 手续费）
+- 服务已开始：不可取消
+- 未支付订单取消：不产生退款，直接释放名额
+
+取消响应示例：
+
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "order": { "id": 1, "status": "CANCELLED", "stage": "CANCELLED", "...": "..." },
+    "refundAmount": 160.00,
+    "feeApplied": true
+  }
+}
+```
+
+## 护工端（需 `CAREGIVER` 角色）
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/caregiver/orders` | 我的服务订单 |
+| `POST /api/v1/caregiver/orders/{id}/depart` | 确认出发 |
+| `POST /api/v1/caregiver/orders/{id}/arrive` | 确认到达 |
+| `POST /api/v1/caregiver/orders/{id}/start` | 开始服务（订单转为 `IN_SERVICE`） |
+| `POST /api/v1/caregiver/orders/{id}/complete` | 完成服务（订单转为 `COMPLETED`） |
+
+动作必须按顺序执行，重复或跳步返回 409；只能操作分配给自己的订单。
+
+## 消息（需登录）
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/messages?page=0&size=10` | 消息分页 |
+| `GET /api/v1/messages/unread-count` | 未读数 |
+| `POST /api/v1/messages/{id}/read` | 标记单条已读 |
+| `POST /api/v1/messages/read-all` | 全部标记已读 |
+
+## 支付回调（公开，签名校验）
+
+`POST /api/v1/payments/callback`
+
+```json
+{ "paymentNo": "PAY...", "success": true, "signature": "HMAC-SHA256 结果" }
+```
+
+- 签名密钥：`app.payment.mock-secret`
+- 同一 `paymentNo` 重复回调直接返回成功（幂等）
+- Mock 支付通过同步接口完成，此入口保留给真实网关
+
 ## 待补充
 
-- 服务类别 / 护工 / 排班查询：P3
-- 订单、支付、取消、进度、消息：P3
-- 管理端接口：P5
+- 管理端接口（服务类别、护工、排班、名额、停班）：P5
 - OpenAPI（Swagger UI）：P6 接入后自动生成
