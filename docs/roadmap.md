@@ -13,15 +13,15 @@
 
 **验收**：干净环境 `mvn verify` 与 `npm run build` 通过；前端首页能显示后端连接状态。
 
-## P1 数据层
+## P1 数据层 ✅
 
-- [ ] Flyway `V1__schema.sql`：10 张业务表 + `payment_records`、`order_status_logs`
-- [ ] `V2__seed.sql`：服务类别、权限、测试账号、示例护工与排班
-- [ ] 实体 / Repository 重写，字段与设计文档对齐
-- [ ] 测试：Repository 集成测试（H2）+ 迁移脚本可重复执行
-- [ ] 打开 `spring.flyway.enabled`，`ddl-auto` 改为 `validate`
+- [x] Flyway `V1__schema.sql`：10 张业务表 + `payment_records`、`order_status_logs`
+- [x] `V2__seed.sql`：服务类别、权限、测试账号、示例护工与基础时段
+- [x] 实体 / Repository 重写，字段与设计文档对齐（差异见 [design-decisions](design-decisions.md)）
+- [x] 测试：迁移与种子数据校验、Repository 查询、名额原子扣减
+- [x] 打开 `spring.flyway.enabled`，`ddl-auto` 改为 `validate`
 
-**验收**：空库执行迁移后表结构完整；重复执行不报错；H2 与 MySQL 均通过。
+**验收**：H2 空库启动自动建表并通过 `validate`；MySQL 8 重建库后迁移成功；`mvn test` 15 个测试全绿。
 
 ## P2 认证授权
 

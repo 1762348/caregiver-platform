@@ -55,15 +55,14 @@ com.youhu.caregiver
 
 ## 数据模型
 
-以系统设计说明书的 10 张表为基础：
+已落地 12 张表（设计文档 10 张 + 2 张审计扩展），完整字段与 ER 图见 [数据库说明](database.md)：
 
 `users` · `caregivers` · `categories` · `caregiver_base_shifts` · `caregiver_schedules`
 `receivers` · `orders` · `messages` · `permissions` · `role_permissions`
+`payment_records` · `order_status_logs`
 
-两处设计调整（P1 记录到 `docs/design-decisions.md`）：
-
-- `time_range varchar` 拆为 `start_time` / `end_time`，展示时再拼装，避免字符串解析
-- 新增 `payment_records`、`order_status_logs`，满足支付审计与状态追溯要求
+与设计文档的差异（时段拆分、枚举编码、身份证派生字段等）统一记录在
+[设计决策记录](design-decisions.md)，避免“文档与实现两张皮”。
 
 ## 环境与配置
 
