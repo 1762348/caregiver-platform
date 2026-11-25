@@ -33,9 +33,13 @@
         :title="item.title"
         :label="item.label"
         is-link
-        @click="notReady(item.title)"
+        @click="openMenu(item)"
       />
     </van-cell-group>
+
+    <van-button class="profile__book" block round type="primary" @click="router.push('/booking')">
+      预约护工
+    </van-button>
 
     <div class="profile__footer">
       <van-button block round plain type="danger" @click="logout">退出登录</van-button>
@@ -62,13 +66,18 @@ const initial = computed(() => {
 })
 
 const menu = [
-  { title: '被照顾人', label: '添加家人的护理档案' },
-  { title: '消息通知', label: '预约、支付与服务提醒' },
-  { title: '关于平台', label: '版本与服务协议' },
+  { title: '我的订单', label: '查看全部服务订单', to: '/orders' },
+  { title: '被照顾人', label: '添加家人的护理档案', to: '/receivers' },
+  { title: '消息通知', label: '预约、支付与服务提醒', to: '/messages' },
+  { title: '关于平台', label: '版本与服务协议', to: '' },
 ]
 
-function notReady(feature: string) {
-  showToast(`${feature}将在后续阶段接入`)
+function openMenu(item: { title: string; to: string }) {
+  if (item.to) {
+    router.push(item.to)
+  } else {
+    showToast('优护 · 社区护工预约平台 v0.1.0')
+  }
 }
 
 function logout() {
@@ -162,6 +171,10 @@ function logout() {
 .profile__footer {
   margin-top: 28px;
   text-align: center;
+}
+
+.profile__book {
+  margin-top: 16px;
 }
 
 .profile__footer p {

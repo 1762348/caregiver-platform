@@ -21,14 +21,15 @@
 ## 界面预览
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="255" alt="首页" />
-  <img src="docs/screenshots/login.png" width="255" alt="登录" />
-  <img src="docs/screenshots/profile.png" width="255" alt="个人中心" />
+  <img src="docs/screenshots/home.png" width="200" alt="首页" />
+  <img src="docs/screenshots/booking.png" width="200" alt="预约确认" />
+  <img src="docs/screenshots/order-detail.png" width="200" alt="订单详情" />
+  <img src="docs/screenshots/orders.png" width="200" alt="订单列表" />
 </p>
 
 ## 当前进度
 
-> 正在按阶段推进：**P0–P3 已完成**（基建、数据层、认证授权、核心业务闭环），前端页面将在 P4 补齐。
+> 正在按阶段推进：**P0–P4 已完成**（基建、数据层、认证、核心业务、用户端页面），护工端与管理端在 P5。
 
 | 阶段 | 内容 | 状态 |
 | --- | --- | --- |
@@ -36,6 +37,7 @@
 | P1 | 数据库迁移（12 张表）、实体与仓库、种子数据 | ✅ |
 | P2 | 认证授权：JWT、短信验证码、三角色权限、登录页联调 | ✅ |
 | P3 | 核心业务：排班查询、预约、支付、取消退款、服务进度、消息 | ✅ |
+| P4 | 用户端页面：预约向导、支付、订单、进度、被照顾人、消息 | ✅ |
 | P4 | 用户端完整页面 | ⬜ |
 | P5 | 护工端 + 管理后台 | ⬜ |
 | P6 | 测试补齐、覆盖率、E2E | ⬜ |

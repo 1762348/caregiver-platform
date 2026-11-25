@@ -12,13 +12,19 @@
           }}
         </p>
       </div>
-      <router-link class="home__avatar" :to="auth.isLoggedIn ? '/profile' : '/login'">
-        <span v-if="auth.isLoggedIn">{{ avatarInitial }}</span>
-        <van-icon v-else name="user-o" size="22" />
-      </router-link>
+      <div class="home__actions">
+        <router-link class="home__bell" to="/messages" aria-label="消息通知">
+          <van-icon name="bell" size="20" />
+          <span v-if="unread > 0" class="home__badge">{{ unread > 99 ? '99+' : unread }}</span>
+        </router-link>
+        <router-link class="home__avatar" :to="auth.isLoggedIn ? '/profile' : '/login'">
+          <span v-if="auth.isLoggedIn">{{ avatarInitial }}</span>
+          <van-icon v-else name="user-o" size="22" />
+        </router-link>
+      </div>
     </header>
 
-    <section class="hero" @click="notReady('在线预约')">
+    <section class="hero" @click="router.push('/booking')">
       <div class="hero__text">
         <h2>预约护工</h2>
         <p>查排班 · 选护工 · 在线支付</p>
@@ -28,85 +34,124 @@
 
     <div class="section-heading">
       <h2>护理服务</h2>
-      <span>全部服务</span>
+      <span>{{ categories.length ? '按类别预约' : '加载中…' }}</span>
     </div>
-    <div class="service-grid">
+    <div v-if="categories.length" class="service-grid">
       <button
-        v-for="item in services"
-        :key="item.name"
+        v-for="category in categories"
+        :key="category.id"
         type="button"
         class="service-item"
-        @click="notReady(item.name)"
+        @click="router.push({ path: '/booking', query: { categoryId: category.id } })"
       >
         <span class="service-item__icon">
-          <van-icon :name="item.icon" size="20" />
+          <van-icon :name="categoryIcons[category.code] ?? 'service-o'" size="20" />
         </span>
-        <span class="service-item__name">{{ item.name }}</span>
-        <span class="service-item__desc">{{ item.desc }}</span>
+        <span class="service-item__name">{{ category.name }}</span>
+        <span class="service-item__desc">¥{{ category.basePrice }} 起</span>
+      </button>
+    </div>
+    <div v-else class="card placeholder-card">
+      <span class="text-muted">{{ categoryError || '正在加载服务类别…' }}</span>
+      <button v-if="categoryError" type="button" class="link-button" @click="loadCategories">
+        重试
       </button>
     </div>
 
     <div class="section-heading">
       <h2>服务进度</h2>
-      <span>实时跟踪</span>
+      <router-link to="/orders" class="link-button">全部订单</router-link>
     </div>
-    <div class="card empty-card">
-      <van-icon name="clock-o" size="30" />
+
+    <section
+      v-if="activeOrder"
+      class="active-card"
+      @click="router.push(`/orders/${activeOrder.id}`)"
+    >
+      <div class="active-card__top">
+        <span class="pill" :class="`pill--${statusTone(activeOrder.status)}`">
+          {{ STATUS_LABELS[activeOrder.status] }}
+        </span>
+        <span class="active-card__stage">{{ STAGE_LABELS[activeOrder.stage] }}</span>
+      </div>
+      <h3>{{ activeOrder.caregiverName }} · {{ activeOrder.categoryName }}</h3>
+      <p>
+        {{ formatDateLabel(activeOrder.serviceDate) }} {{ activeOrder.serviceTime }} ·
+        {{ activeOrder.receiverName }}
+      </p>
+      <div class="active-card__foot">
+        <strong>¥{{ activeOrder.amount }}</strong>
+        <span>{{ activeOrder.canPay ? '去支付' : '查看详情' }} →</span>
+      </div>
+    </section>
+
+    <div v-else class="card empty-card">
+      <van-icon name="clock-o" size="28" />
       <div>
         <strong>暂无进行中的服务</strong>
-        <p class="text-muted">预约成功后，可在这里查看护工出发、到达与服务剩余时间</p>
+        <p class="text-muted">预约成功后，可在这里查看护工出发、到达与服务进度</p>
       </div>
     </div>
 
-    <div class="section-heading">
-      <h2>系统状态</h2>
-      <button type="button" class="link-button" @click="loadMeta">刷新</button>
+    <div class="quick-links">
+      <router-link to="/receivers" class="quick-link">
+        <van-icon name="friends-o" size="20" />
+        <span>被照顾人</span>
+      </router-link>
+      <router-link to="/messages" class="quick-link">
+        <van-icon name="chat-o" size="20" />
+        <span>消息通知</span>
+      </router-link>
+      <router-link to="/orders" class="quick-link">
+        <van-icon name="orders-o" size="20" />
+        <span>我的订单</span>
+      </router-link>
     </div>
-    <div class="card status-card">
+
+    <div class="system-status" @click="loadMeta">
       <span class="status-dot" :class="`status-dot--${metaState}`" />
-      <div class="status-card__body">
-        <strong v-if="metaState === 'loading'">正在连接后端…</strong>
-        <strong v-else-if="metaState === 'ok'">后端已连接</strong>
-        <strong v-else>后端未连接</strong>
-        <p v-if="meta" class="text-muted">
-          {{ meta.displayName }} · v{{ meta.version }} · {{ meta.profile }}
-        </p>
-        <p v-else-if="metaState === 'error'" class="text-muted">
-          请确认后端已在 8080 端口启动
-        </p>
-      </div>
+      <span v-if="metaState === 'ok'">后端已连接 · v{{ meta?.version }} · {{ meta?.profile }}</span>
+      <span v-else-if="metaState === 'loading'">正在连接后端…</span>
+      <span v-else>后端未连接，点击重试</span>
     </div>
-
-    <p class="home__footnote">P3 核心业务已就绪 · 预约、支付与服务进度页面将在 P4 接入</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { showToast } from 'vant'
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+import { fetchCategories, type Category } from '@/api/catalog'
 import { fetchServerMeta, type ServerMeta } from '@/api/meta'
+import { fetchUnreadCount } from '@/api/messages'
+import { fetchOrders, type Order } from '@/api/orders'
 import { useAuthStore } from '@/stores/auth'
 import { maskPhone } from '@/utils/format'
+import { STAGE_LABELS, STATUS_LABELS, formatDateLabel, statusTone } from '@/utils/order'
+
+const categoryIcons: Record<string, string> = {
+  DAILY_CARE: 'friends-o',
+  PROFESSIONAL_CARE: 'medal-o',
+  REHAB_TRAINING: 'chart-trending-o',
+  ESCORT_SERVICE: 'location-o',
+  NIGHT_CARE: 'closed-eye',
+}
 
 const auth = useAuthStore()
+const router = useRouter()
+
+const categories = ref<Category[]>([])
+const categoryError = ref('')
+const activeOrder = ref<Order | null>(null)
+const unread = ref(0)
+const meta = ref<ServerMeta | null>(null)
+const metaState = ref<'loading' | 'ok' | 'error'>('loading')
 
 const avatarInitial = computed(() => {
   const name = auth.user?.name?.trim()
   if (name) return name.slice(0, 1)
   return auth.user?.phone?.slice(-2) ?? '优'
 })
-
-const services = [
-  { name: '日常照料', desc: '饮食起居', icon: 'friends-o' },
-  { name: '专业护理', desc: '术后康复', icon: 'medal-o' },
-  { name: '康复训练', desc: '功能恢复', icon: 'chart-trending-o' },
-  { name: '陪诊服务', desc: '陪同就医', icon: 'location-o' },
-  { name: '夜间陪护', desc: '全天守护', icon: 'closed-eye' },
-] as const
-
-const meta = ref<ServerMeta | null>(null)
-const metaState = ref<'loading' | 'ok' | 'error'>('loading')
 
 const greeting = (() => {
   const hour = new Date().getHours()
@@ -116,6 +161,38 @@ const greeting = (() => {
   if (hour < 18) return '下午好'
   return '晚上好'
 })()
+
+async function loadCategories() {
+  categoryError.value = ''
+  try {
+    categories.value = await fetchCategories()
+  } catch (error) {
+    categories.value = []
+    categoryError.value = error instanceof Error ? error.message : '服务类别加载失败'
+  }
+}
+
+async function loadActiveOrder() {
+  if (!auth.isLoggedIn) return
+  try {
+    const page = await fetchOrders({ page: 0, size: 10 })
+    activeOrder.value =
+      page.items.find((order) =>
+        ['PENDING_PAYMENT', 'PAID', 'IN_SERVICE'].includes(order.status),
+      ) ?? null
+  } catch {
+    activeOrder.value = null
+  }
+}
+
+async function loadUnread() {
+  if (!auth.isLoggedIn) return
+  try {
+    unread.value = await fetchUnreadCount()
+  } catch {
+    unread.value = 0
+  }
+}
 
 async function loadMeta() {
   metaState.value = 'loading'
@@ -128,11 +205,12 @@ async function loadMeta() {
   }
 }
 
-function notReady(feature: string) {
-  showToast(`${feature}将在后续阶段接入`)
-}
-
-onMounted(loadMeta)
+onMounted(() => {
+  void loadCategories()
+  void loadActiveOrder()
+  void loadUnread()
+  void loadMeta()
+})
 </script>
 
 <style scoped>
@@ -168,17 +246,39 @@ onMounted(loadMeta)
   color: var(--yh-text-secondary);
 }
 
+.home__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.home__bell,
 .home__avatar {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   font-size: 16px;
   font-weight: 700;
   color: var(--yh-primary);
   text-decoration: none;
   background: var(--yh-primary-light);
   border-radius: 50%;
+}
+
+.home__badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  padding: 0 5px;
+  font-size: 10px;
+  line-height: 18px;
+  color: #fff;
+  text-align: center;
+  background: #ef4444;
+  border-radius: 9px;
 }
 
 .hero {
@@ -228,17 +328,10 @@ onMounted(loadMeta)
   padding: 14px 12px;
   font: inherit;
   text-align: left;
-  background: var(--yh-surface);
+  cursor: pointer;
+  background: #fff;
   border: 1px solid var(--yh-border);
   border-radius: var(--yh-radius-md);
-  cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.service-item:active {
-  transform: scale(0.98);
 }
 
 .service-item__icon {
@@ -254,12 +347,94 @@ onMounted(loadMeta)
 .service-item__name {
   font-size: 14px;
   font-weight: 600;
-  color: var(--yh-text);
 }
 
 .service-item__desc {
   font-size: 11px;
   color: var(--yh-text-secondary);
+}
+
+.active-card {
+  padding: 16px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid var(--yh-border);
+  border-left: 5px solid var(--yh-primary);
+  border-radius: var(--yh-radius-md);
+  box-shadow: var(--yh-shadow);
+}
+
+.active-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.active-card__stage {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--yh-primary);
+}
+
+.active-card h3 {
+  margin: 10px 0 6px;
+  font-size: 15px;
+}
+
+.active-card p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--yh-text-secondary);
+}
+
+.active-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px dashed var(--yh-border);
+}
+
+.active-card__foot strong {
+  font-size: 18px;
+}
+
+.active-card__foot span {
+  font-size: 12px;
+  color: var(--yh-primary);
+}
+
+.pill {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+}
+
+.pill--warning {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.pill--primary {
+  color: #075985;
+  background: #e0f2fe;
+}
+
+.pill--success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.pill--default {
+  color: #334155;
+  background: #e2e8f0;
+}
+
+.pill--danger {
+  color: #991b1b;
+  background: #fee2e2;
 }
 
 .empty-card {
@@ -281,43 +456,62 @@ onMounted(loadMeta)
   line-height: 1.6;
 }
 
-.status-card {
+.placeholder-card {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.quick-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  padding: 14px 8px;
+  font-size: 12px;
+  color: var(--yh-text);
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid var(--yh-border);
+  border-radius: var(--yh-radius-md);
+}
+
+.quick-link :deep(.van-icon) {
+  color: var(--yh-primary);
+}
+
+.system-status {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 22px;
+  font-size: 11px;
+  color: #94a3b8;
+  cursor: pointer;
 }
 
 .status-dot {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  margin-top: 6px;
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
   background: #cbd5e1;
+  border-radius: 50%;
 }
 
 .status-dot--ok {
   background: #10b981;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
 }
 
 .status-dot--error {
   background: #ef4444;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
-}
-
-.status-dot--loading {
-  background: #f59e0b;
-  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
-}
-
-.status-card__body strong {
-  font-size: 14px;
-}
-
-.status-card__body p {
-  margin: 4px 0 0;
-  line-height: 1.5;
 }
 
 .link-button {
@@ -325,15 +519,9 @@ onMounted(loadMeta)
   font: inherit;
   font-size: 12px;
   color: var(--yh-primary);
+  text-decoration: none;
   cursor: pointer;
   background: none;
   border: none;
-}
-
-.home__footnote {
-  margin: 28px 0 0;
-  font-size: 11px;
-  color: #94a3b8;
-  text-align: center;
 }
 </style>

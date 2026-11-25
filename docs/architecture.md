@@ -68,6 +68,15 @@ com.youhu.caregiver
 > 验证码目前存于单机内存（`SmsCodeService`），多实例部署时需替换为 Redis；
 > 生产环境必须关闭固定验证码，并实现真实短信服务商适配器。
 
+## 前端结构
+
+- **壳层**：`MobileLayout` 提供 480px 居中手机容器 + 底部导航（首页 / 订单 / 我的）；预约向导与订单详情使用独立全屏路由，避免底部导航遮挡操作栏
+- **路由**：`/login`、`/`、`/booking`、`/orders`、`/orders/:id`、`/receivers`、`/messages`、`/profile`；`requiresAuth` 由全局守卫校验，未登录跳转登录并携带 `redirect`
+- **状态**：`auth` store 负责令牌与用户信息（localStorage 持久化，刷新后调用 `/auth/me` 恢复）；页面数据由各页面直接调用 API，不额外引入全局缓存
+- **请求层**：`api/http.ts` 统一注入 Bearer Token、解包 `ApiResponse`、401 自动清理并跳转登录
+- **交互**：支付用 ActionSheet 选渠道；取消用确认弹窗；服务进度详情页每 15 秒轮询，离开页面即清理定时器
+- **样式**：CSS 变量 + 组件内 scoped 样式，主色 `#0891b2`，不依赖 UI 框架主题覆盖
+
 ## 数据模型
 
 已落地 12 张表（设计文档 10 张 + 2 张审计扩展），完整字段与 ER 图见 [数据库说明](database.md)：

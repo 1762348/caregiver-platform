@@ -10,6 +10,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '登录', public: true },
   },
   {
+    path: '/booking',
+    name: 'booking',
+    component: () => import('@/views/BookingView.vue'),
+    meta: { title: '预约护工', requiresAuth: true },
+  },
+  {
+    path: '/orders/:id',
+    name: 'order-detail',
+    component: () => import('@/views/OrderDetailView.vue'),
+    meta: { title: '订单详情', requiresAuth: true },
+  },
+  {
     path: '/',
     component: () => import('@/layouts/MobileLayout.vue'),
     children: [
@@ -30,6 +42,18 @@ const routes: RouteRecordRaw[] = [
         name: 'profile',
         component: () => import('@/views/ProfileView.vue'),
         meta: { title: '我的', requiresAuth: true },
+      },
+      {
+        path: 'receivers',
+        name: 'receivers',
+        component: () => import('@/views/ReceiversView.vue'),
+        meta: { title: '被照顾人', requiresAuth: true },
+      },
+      {
+        path: 'messages',
+        name: 'messages',
+        component: () => import('@/views/MessagesView.vue'),
+        meta: { title: '消息通知', requiresAuth: true },
       },
     ],
   },
