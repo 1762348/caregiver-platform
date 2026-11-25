@@ -40,7 +40,8 @@ public class SmsCodeService {
     public void send(String phone) {
         Instant now = clock.instant();
         CodeEntry previous = codes.get(phone);
-        if (previous != null && now.isBefore(previous.nextSendAt())) {
+        if (properties.resendIntervalSeconds() > 0 && previous != null
+                && now.isBefore(previous.nextSendAt())) {
             long waitSeconds = Duration.between(now, previous.nextSendAt()).toSeconds() + 1;
             throw new BusinessException(429, "验证码发送过于频繁，请 " + waitSeconds + " 秒后重试");
         }

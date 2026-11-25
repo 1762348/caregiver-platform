@@ -229,6 +229,8 @@
 
 | 接口 | 说明 |
 | --- | --- |
+| `GET /api/v1/caregiver/me` | 护工个人资料（工号、类别、评分） |
+| `GET /api/v1/caregiver/schedules?from=&to=` | 自己的排班（默认未来 14 天） |
 | `GET /api/v1/caregiver/orders` | 我的服务订单 |
 | `POST /api/v1/caregiver/orders/{id}/depart` | 确认出发 |
 | `POST /api/v1/caregiver/orders/{id}/arrive` | 确认到达 |
@@ -236,6 +238,44 @@
 | `POST /api/v1/caregiver/orders/{id}/complete` | 完成服务（订单转为 `COMPLETED`） |
 
 动作必须按顺序执行，重复或跳步返回 409；只能操作分配给自己的订单。
+
+## 管理端（需 `ADMIN` 角色）
+
+### 服务类别
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/admin/categories` | 全部类别（含停用，附带护工数） |
+| `POST /api/v1/admin/categories` | 新增 |
+| `PUT /api/v1/admin/categories/{id}` | 修改 |
+| `DELETE /api/v1/admin/categories/{id}` | 删除（仍有护工时 409） |
+
+### 护工
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/admin/caregivers?keyword=&status=&page=&size=` | 搜索/分页 |
+| `POST /api/v1/admin/caregivers` | 新增护工并自动开通护工账号 |
+| `PUT /api/v1/admin/caregivers/{id}` | 修改 |
+| `POST /api/v1/admin/caregivers/{id}/status?status=ACTIVE` | 启用/停用 |
+
+### 排班与名额
+
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/v1/admin/schedules?caregiverId=&from=&to=` | 查询护工排班 |
+| `POST /api/v1/admin/schedules` | 新增单条排班 |
+| `POST /api/v1/admin/schedules/generate` | 按基础时段批量生成（`caregiverId/from/to/totalQuota`） |
+| `PUT /api/v1/admin/schedules/{id}` | 修改时段/名额/价格/状态 |
+| `POST /api/v1/admin/schedules/{id}/quota` | 调整剩余名额 `{remainingQuota}` |
+| `POST /api/v1/admin/schedules/{id}/stop` | 停班：关闭排班并全额退款取消订单 |
+| `DELETE /api/v1/admin/schedules/{id}` | 删除（已有订单时 409，建议改为停班） |
+
+停班响应：
+
+```json
+{ "scheduleId": 12, "cancelledOrders": 2, "refundTotal": 400.00 }
+```
 
 ## 消息（需登录）
 
@@ -260,5 +300,4 @@
 
 ## 待补充
 
-- 管理端接口（服务类别、护工、排班、名额、停班）：P5
 - OpenAPI（Swagger UI）：P6 接入后自动生成

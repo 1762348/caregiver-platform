@@ -56,6 +56,7 @@ public class SecurityConfig {
                                 "/api/v1/schedules/**").permitAll()
                         .requestMatchers("/api/v1/meta", "/actuator/health", "/actuator/info",
                                 "/error").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(handler -> handler
                         .authenticationEntryPoint(authenticationEntryPoint)

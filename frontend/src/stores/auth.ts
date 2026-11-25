@@ -27,6 +27,16 @@ export const useAuthStore = defineStore('auth', () => {
     if (!user.value) return ''
     return user.value.name || user.value.phone
   })
+  const homePath = computed(() => {
+    switch (user.value?.role) {
+      case 'ADMIN':
+        return '/admin/categories'
+      case 'CAREGIVER':
+        return '/caregiver'
+      default:
+        return '/'
+    }
+  })
 
   function setSession(value: string, profile: UserProfile) {
     token.value = value
@@ -66,6 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
     isLoggedIn,
     roleLabel,
     displayName,
+    homePath,
     setSession,
     sendCode,
     login,

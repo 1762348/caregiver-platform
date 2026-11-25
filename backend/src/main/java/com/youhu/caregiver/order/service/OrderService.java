@@ -207,8 +207,36 @@ public class OrderService {
         return new CancelResult(toView(order), refundAmount, feeApplied);
     }
 
-    // ---------------------------------------------------------------- 查询
+    /**
+     * 管理端强制取消（停班等场景）：不受 2 小时规则限制，已支付订单全额退款。
+     */
+    @Transactional
+    public CancelResult forceCancel(Long orderId, Long operatorId, UserRole role, String reason) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> BusinessException.notFound("订单不存在"));
+        if (!order.getStatus().isCancellable()) {
+            throw BusinessException.conflict("当前订单状态不可取消");
+        }
+        OrderStatus previous = order.getStatus();
+        BigDecimal refundAmount = BigDecimal.ZERO;
+        if (previous == OrderStatus.PAID) {
+            refundAmount = paymentService.refund(order, order.getAmount());
+        }
+        LocalDateTime now = LocalDateTime.now(clock);
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setCancelTime(now);
+        order.setCancelReason(reason);
+        orderRepository.save(order);
+        scheduleRepository.release(order.getScheduleId());
+        logStatus(order, previous, OrderStatus.CANCELLED, operatorId, role, reason);
+        messageService.notifyUser(order.getUserId(), MessageType.ORDER, "订单已取消",
+                "订单 " + order.getOrderNo() + " 因" + reason + "已取消"
+                        + (refundAmount.signum() > 0 ? "，退款 " + refundAmount + " 元" : ""),
+                "/orders/" + order.getId());
+        return new CancelResult(toView(order), refundAmount, false);
+    }
 
+    // ---------------------------------------------------------------- 查询
     @Transactional(readOnly = true)
     public OrderView get(Long userId, Long orderId) {
         return toView(ownedOrder(userId, orderId));

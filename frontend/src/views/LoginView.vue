@@ -137,7 +137,8 @@ async function onSubmit() {
   try {
     await auth.login(phone.value, code.value)
     showToast('登录成功')
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    const redirect =
+      typeof route.query.redirect === 'string' ? route.query.redirect : auth.homePath
     await router.replace(redirect)
   } catch (error) {
     showToast(error instanceof Error ? error.message : '登录失败')

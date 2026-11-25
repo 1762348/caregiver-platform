@@ -36,4 +36,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     boolean existsByReceiverId(Long receiverId);
 
     long countByScheduleId(Long scheduleId);
+
+    List<Order> findByScheduleIdAndStatusIn(Long scheduleId, Collection<OrderStatus> statuses);
 }

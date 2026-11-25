@@ -13,4 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByCode(String code);
 
     boolean existsByName(String name);
+
+    java.util.List<Category> findAllByOrderByBasePriceAsc();
 }

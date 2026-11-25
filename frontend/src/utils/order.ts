@@ -76,8 +76,7 @@ export function formatDateTime(value: string | null | undefined): string {
   return value.replace('T', ' ').slice(0, 16)
 }
 
-/** 生成未来 N 天的日期选项（YYYY-MM-DD） */
-export function nextDays(count: number, from = new Date()): Array<{ value: string; label: string }> {
+/** 生成未来 N 天的日期选项（YYYY-MM-DD） */export function nextDays(count: number, from = new Date()): Array<{ value: string; label: string }> {
   const result: Array<{ value: string; label: string }> = []
   for (let i = 0; i < count; i++) {
     const date = new Date(from.getFullYear(), from.getMonth(), from.getDate() + i)
@@ -93,4 +92,24 @@ export function nextDays(count: number, from = new Date()): Array<{ value: strin
     })
   }
   return result
+}
+
+export type CaregiverActionKey = 'depart' | 'arrive' | 'start' | 'complete'
+
+export interface CaregiverAction {
+  key: CaregiverActionKey
+  label: string
+}
+
+/** 根据订单当前进度推导护工下一步动作 */
+export function caregiverAction(order: {
+  status: OrderStatus
+  departedAt: string | null
+  arrivedAt: string | null
+}): CaregiverAction | null {
+  if (order.status === 'IN_SERVICE') return { key: 'complete', label: '完成服务' }
+  if (order.status !== 'PAID') return null
+  if (!order.departedAt) return { key: 'depart', label: '确认出发' }
+  if (!order.arrivedAt) return { key: 'arrive', label: '确认到达' }
+  return { key: 'start', label: '开始服务' }
 }

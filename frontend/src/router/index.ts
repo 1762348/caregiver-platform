@@ -2,6 +2,9 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
 
+const caregiverMeta = { requiresAuth: true, roles: ['CAREGIVER'] }
+const adminMeta = { requiresAuth: true, roles: ['ADMIN'] }
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
@@ -13,13 +16,58 @@ const routes: RouteRecordRaw[] = [
     path: '/booking',
     name: 'booking',
     component: () => import('@/views/BookingView.vue'),
-    meta: { title: '预约护工', requiresAuth: true },
+    meta: { title: '预约护工', requiresAuth: true, roles: ['USER'] },
   },
   {
     path: '/orders/:id',
     name: 'order-detail',
     component: () => import('@/views/OrderDetailView.vue'),
-    meta: { title: '订单详情', requiresAuth: true },
+    meta: { title: '订单详情', requiresAuth: true, roles: ['USER'] },
+  },
+  {
+    path: '/caregiver',
+    component: () => import('@/layouts/CaregiverLayout.vue'),
+    meta: { ...caregiverMeta, title: '护工工作台' },
+    children: [
+      {
+        path: '',
+        name: 'caregiver-home',
+        component: () => import('@/views/caregiver/CaregiverHomeView.vue'),
+        meta: { ...caregiverMeta, title: '护工工作台' },
+      },
+      {
+        path: 'orders',
+        name: 'caregiver-orders',
+        component: () => import('@/views/caregiver/CaregiverOrdersView.vue'),
+        meta: { ...caregiverMeta, title: '护工订单' },
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    meta: { ...adminMeta, title: '管理后台' },
+    children: [
+      { path: '', redirect: '/admin/categories' },
+      {
+        path: 'categories',
+        name: 'admin-categories',
+        component: () => import('@/views/admin/AdminCategoriesView.vue'),
+        meta: { ...adminMeta, title: '服务类别' },
+      },
+      {
+        path: 'caregivers',
+        name: 'admin-caregivers',
+        component: () => import('@/views/admin/AdminCaregiversView.vue'),
+        meta: { ...adminMeta, title: '护工管理' },
+      },
+      {
+        path: 'schedules',
+        name: 'admin-schedules',
+        component: () => import('@/views/admin/AdminSchedulesView.vue'),
+        meta: { ...adminMeta, title: '排班与名额' },
+      },
+    ],
   },
   {
     path: '/',
@@ -35,7 +83,7 @@ const routes: RouteRecordRaw[] = [
         path: 'orders',
         name: 'orders',
         component: () => import('@/views/OrdersView.vue'),
-        meta: { title: '我的订单', requiresAuth: true },
+        meta: { title: '我的订单', requiresAuth: true, roles: ['USER'] },
       },
       {
         path: 'profile',
@@ -47,7 +95,7 @@ const routes: RouteRecordRaw[] = [
         path: 'receivers',
         name: 'receivers',
         component: () => import('@/views/ReceiversView.vue'),
-        meta: { title: '被照顾人', requiresAuth: true },
+        meta: { title: '被照顾人', requiresAuth: true, roles: ['USER'] },
       },
       {
         path: 'messages',
@@ -82,8 +130,13 @@ router.beforeEach(async (to) => {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
 
+  const roles = to.meta.roles as string[] | undefined
+  if (roles && (!auth.user || !roles.includes(auth.user.role))) {
+    return { path: auth.homePath }
+  }
+
   if (to.name === 'login' && auth.isLoggedIn) {
-    return { path: '/' }
+    return { path: auth.homePath }
   }
 
   return true

@@ -26,7 +26,7 @@ public record SmsProperties(
         if (ttlSeconds <= 0) {
             ttlSeconds = 300;
         }
-        if (resendIntervalSeconds <= 0) {
+        if (resendIntervalSeconds < 0) {
             resendIntervalSeconds = 60;
         }
         if (maxAttempts <= 0) {
