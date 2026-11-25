@@ -3,6 +3,7 @@
 > 连接需要护工服务的家庭与专业护工：查排班、约护工、在线支付、跟踪上门服务进度。
 
 [![CI](https://github.com/1762348/caregiver-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/1762348/caregiver-platform/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/1762348/caregiver-platform)](https://github.com/1762348/caregiver-platform/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://adoptium.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -18,6 +19,15 @@
 
 项目按「需求说明书 + 系统设计说明书」的功能范围实现，同时按可上线的工程标准建设：数据库版本管理、自动化测试、CI、容器化部署与完整文档。
 
+## 项目亮点
+
+- **并发安全**：名额用条件更新原子扣减，6 线程抢最后 1 个名额只有 1 单成功（有并发测试）
+- **状态可追溯**：订单状态机 + `order_status_logs`，取消/支付/进度都做前置状态校验
+- **退款规则完整**：2 小时免费取消、2 小时内 20% 手续费、停班全额退款，失败整体回滚
+- **工程化**：Flyway 迁移、JWT 鉴权、统一响应与异常、Swagger、Docker Compose
+- **质量门禁**：后端 58 测试 + JaCoCo 覆盖率门槛，前端 17 测试 + ESLint/Prettier，CI 三 Job
+- **可替换边界**：支付/短信用适配器 + Mock 实现，接真实渠道不改业务代码
+
 ## 界面预览
 
 <p align="center">
@@ -30,6 +40,12 @@
   <img src="docs/screenshots/admin.png" width="560" alt="管理后台" />
   <img src="docs/screenshots/caregiver.png" width="170" alt="护工工作台" />
 </p>
+
+## 演示
+
+- [2–3 分钟演示脚本](docs/demo-script.md)：按镜头走完用户、护工、管理三端，附讲解词
+- [面试讲解与常见追问](docs/interview-notes.md)：一分钟架构、五个技术亮点、追问回答
+- 建议录屏后放到 B 站/YouTube（仅链接可见），把链接补充到这里
 
 ## 当前进度
 
@@ -196,6 +212,7 @@ cd frontend && npm run format:check  # Prettier
 
 ## 文档
 
+- [演示脚本](docs/demo-script.md) 与 [面试讲解](docs/interview-notes.md)
 - [接口文档](docs/api.md)（Swagger UI：启动后访问 `/swagger-ui.html`）
 - [部署指南](docs/deployment.md)
 - [架构说明](docs/architecture.md)
