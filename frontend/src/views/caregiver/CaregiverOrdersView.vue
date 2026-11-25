@@ -59,11 +59,7 @@
 import { showConfirmDialog, showToast } from 'vant'
 import { computed, onMounted, ref } from 'vue'
 
-import {
-  fetchCaregiverOrders,
-  updateOrderProgress,
-  type ProgressAction,
-} from '@/api/caregiver'
+import { fetchCaregiverOrders, updateOrderProgress, type ProgressAction } from '@/api/caregiver'
 import type { Order } from '@/api/orders'
 import {
   STAGE_LABELS,
@@ -106,10 +102,7 @@ async function load() {
   }
 }
 
-async function runAction(
-  order: Order,
-  action: { key: ProgressAction; label: string },
-) {
+async function runAction(order: Order, action: { key: ProgressAction; label: string }) {
   if (action.key === 'complete') {
     try {
       await showConfirmDialog({

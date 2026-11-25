@@ -32,9 +32,18 @@
           </div>
         </div>
         <dl class="receiver-card__info">
-          <div v-if="receiver.health"><dt>健康状况</dt><dd>{{ receiver.health }}</dd></div>
-          <div v-if="receiver.special"><dt>特殊需求</dt><dd>{{ receiver.special }}</dd></div>
-          <div v-if="receiver.phone"><dt>联系电话</dt><dd>{{ receiver.phone }}</dd></div>
+          <div v-if="receiver.health">
+            <dt>健康状况</dt>
+            <dd>{{ receiver.health }}</dd>
+          </div>
+          <div v-if="receiver.special">
+            <dt>特殊需求</dt>
+            <dd>{{ receiver.special }}</dd>
+          </div>
+          <div v-if="receiver.phone">
+            <dt>联系电话</dt>
+            <dd>{{ receiver.phone }}</dd>
+          </div>
         </dl>
         <div class="receiver-card__actions">
           <van-button size="small" plain @click="openForm(receiver)">编辑</van-button>
@@ -53,7 +62,12 @@
           placeholder="18 位身份证号"
           maxlength="18"
         />
-        <van-field v-model="form.relation" label="关系" placeholder="本人 / 母亲 / 父亲" maxlength="20" />
+        <van-field
+          v-model="form.relation"
+          label="关系"
+          placeholder="本人 / 母亲 / 父亲"
+          maxlength="20"
+        />
         <van-field v-model="form.phone" label="电话" type="tel" placeholder="选填" maxlength="11" />
         <van-field
           v-model="form.health"

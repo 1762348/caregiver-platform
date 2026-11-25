@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  caregiverAction,
   formatDateLabel,
   formatDateTime,
   nextDays,
@@ -61,5 +62,42 @@ describe('statusTone', () => {
     expect(statusTone('IN_SERVICE')).toBe('success')
     expect(statusTone('COMPLETED')).toBe('default')
     expect(statusTone('CANCELLED')).toBe('danger')
+  })
+})
+
+describe('caregiverAction', () => {
+  it('按时间戳给出下一步动作', () => {
+    expect(caregiverAction({ status: 'PAID', departedAt: null, arrivedAt: null })?.key).toBe(
+      'depart',
+    )
+    expect(
+      caregiverAction({
+        status: 'PAID',
+        departedAt: '2026-12-01T08:00:00',
+        arrivedAt: null,
+      })?.key,
+    ).toBe('arrive')
+    expect(
+      caregiverAction({
+        status: 'PAID',
+        departedAt: '2026-12-01T08:00:00',
+        arrivedAt: '2026-12-01T08:40:00',
+      })?.key,
+    ).toBe('start')
+    expect(
+      caregiverAction({
+        status: 'IN_SERVICE',
+        departedAt: '2026-12-01T08:00:00',
+        arrivedAt: '2026-12-01T08:40:00',
+      })?.key,
+    ).toBe('complete')
+  })
+
+  it('未支付或已结束订单没有可执行动作', () => {
+    expect(
+      caregiverAction({ status: 'PENDING_PAYMENT', departedAt: null, arrivedAt: null }),
+    ).toBeNull()
+    expect(caregiverAction({ status: 'COMPLETED', departedAt: null, arrivedAt: null })).toBeNull()
+    expect(caregiverAction({ status: 'CANCELLED', departedAt: null, arrivedAt: null })).toBeNull()
   })
 })

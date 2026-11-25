@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 "/api/v1/categories/**", "/api/v1/caregivers/**",
                                 "/api/v1/schedules/**").permitAll()
                         .requestMatchers("/api/v1/meta", "/actuator/health", "/actuator/info",
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                                 "/error").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

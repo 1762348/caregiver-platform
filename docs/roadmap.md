@@ -80,14 +80,18 @@
 看到今日排班与待处理订单；普通用户访问管理端返回 403、访问护工端 403；
 `mvn test` 58 个测试通过，前端 14 个单元测试与构建通过。
 
-## P6 质量
+## P6 测试与质量 ✅
 
-- [ ] 核心 Service 覆盖率 ≥ 70%
-- [ ] 前端组件与工具函数测试
-- [ ] E2E 冒烟（Playwright，可选）
-- [ ] 统一日志、错误码文档、Swagger 完整
+- [x] JaCoCo 覆盖率报告 + 门槛（行 ≥65%、分支 ≥40%，当前 70.8% / 47.8%）
+- [x] 后端测试补齐：管理端 API、停班退款、角色隔离、并发抢名额、订单全流程
+- [x] 前端 Vitest：工具函数、认证 store、HomeView 组件测试（17 个）
+- [x] springdoc OpenAPI：`/swagger-ui.html` 与 `/v3/api-docs` 可直接调试
+- [x] ESLint（flat config）+ Prettier，CI 执行 lint 与格式检查
+- [x] CI 上传 JaCoCo 报告；README/测试文档更新
+- [ ] E2E（Playwright）未纳入 CI：需要同时启动 MySQL 与前后端，当前以浏览器脚本人工验证
 
-**验收**：CI 全绿，覆盖率达标，`docs/api.md` 与实际接口一致。
+**验收**：`mvn clean verify` 输出 “All coverage checks have been met.”；前端 lint 0 警告、17 个测试通过；
+Swagger UI 返回 200 且包含全部接口；CI 串联后端与前端质量门禁。
 
 ## P7 部署与发布
 

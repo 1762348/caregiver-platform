@@ -13,9 +13,15 @@
         <button type="button" class="cg-hero__logout" @click="logout">退出</button>
       </div>
       <div class="cg-stats">
-        <div><strong>{{ todaySchedules.length }}</strong><span>今日排班</span></div>
-        <div><strong>{{ pendingOrders.length }}</strong><span>待服务</span></div>
-        <div><strong>{{ servicingOrders.length }}</strong><span>服务中</span></div>
+        <div>
+          <strong>{{ todaySchedules.length }}</strong><span>今日排班</span>
+        </div>
+        <div>
+          <strong>{{ pendingOrders.length }}</strong><span>待服务</span>
+        </div>
+        <div>
+          <strong>{{ servicingOrders.length }}</strong><span>服务中</span>
+        </div>
       </div>
     </header>
 
@@ -128,9 +134,7 @@ const todaySchedules = computed(() =>
 const activeOrders = computed(() =>
   orders.value.filter((order) => ['PAID', 'IN_SERVICE'].includes(order.status)),
 )
-const pendingOrders = computed(() =>
-  activeOrders.value.filter((order) => order.status === 'PAID'),
-)
+const pendingOrders = computed(() => activeOrders.value.filter((order) => order.status === 'PAID'))
 const servicingOrders = computed(() =>
   activeOrders.value.filter((order) => order.status === 'IN_SERVICE'),
 )

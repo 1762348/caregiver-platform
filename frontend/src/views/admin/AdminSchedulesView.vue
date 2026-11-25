@@ -241,7 +241,12 @@ async function generate() {
 }
 
 async function create() {
-  if (!caregiverId.value || !createForm.serviceDate || !createForm.startTime || !createForm.endTime) {
+  if (
+    !caregiverId.value ||
+    !createForm.serviceDate ||
+    !createForm.startTime ||
+    !createForm.endTime
+  ) {
     ElMessage.warning('请完整填写日期与时段')
     return
   }
@@ -294,9 +299,7 @@ async function stop(row: AdminSchedule) {
       { inputValue: '护工临时请假', confirmButtonText: '确认停班' },
     )
     const result = await stopSchedule(row.id, value)
-    ElMessage.success(
-      `已停班，取消 ${result.cancelledOrders} 单，退款 ¥${result.refundTotal}`,
-    )
+    ElMessage.success(`已停班，取消 ${result.cancelledOrders} 单，退款 ¥${result.refundTotal}`)
     await load()
   } catch (error) {
     if (error !== 'cancel' && error !== 'close') {

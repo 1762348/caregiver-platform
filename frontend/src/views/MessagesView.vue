@@ -41,12 +41,7 @@ import { showToast } from 'vant'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import {
-  fetchMessages,
-  markAllMessagesRead,
-  markMessageRead,
-  type Message,
-} from '@/api/messages'
+import { fetchMessages, markAllMessagesRead, markMessageRead, type Message } from '@/api/messages'
 import { formatDateTime } from '@/utils/order'
 
 const router = useRouter()

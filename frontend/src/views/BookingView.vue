@@ -71,7 +71,12 @@
           <div class="slot-card__time">{{ slot.timeRange }}</div>
           <div class="slot-card__body">
             <strong>{{ slot.caregiverName }}</strong>
-            <small>{{ slot.categoryName }} · 剩 {{ slot.remainingQuota }}/{{ slot.totalQuota }} 名额</small>
+            <small
+              >{{ slot.categoryName }} · 剩 {{ slot.remainingQuota }}/{{
+                slot.totalQuota
+              }}
+              名额</small
+            >
           </div>
           <div class="slot-card__price">¥{{ slot.price }}</div>
         </button>
@@ -99,7 +104,9 @@
         >
           <span class="receiver-card__avatar">{{ receiver.name.slice(0, 1) }}</span>
           <div class="receiver-card__body">
-            <strong>{{ receiver.name }}<small>{{ receiver.relation }}</small></strong>
+            <strong
+              >{{ receiver.name }}<small>{{ receiver.relation }}</small></strong
+            >
             <p>{{ receiver.health || '暂无健康备注' }}</p>
           </div>
           <van-icon name="success" class="receiver-card__check" />
@@ -110,8 +117,12 @@
     <!-- 4. 确认 -->
     <section v-else class="section">
       <div class="card summary">
-        <div class="summary__row"><span>服务类别</span><strong>{{ selectedCategory?.name }}</strong></div>
-        <div class="summary__row"><span>护工</span><strong>{{ selectedSchedule?.caregiverName }}</strong></div>
+        <div class="summary__row">
+          <span>服务类别</span><strong>{{ selectedCategory?.name }}</strong>
+        </div>
+        <div class="summary__row">
+          <span>护工</span><strong>{{ selectedSchedule?.caregiverName }}</strong>
+        </div>
         <div class="summary__row">
           <span>服务时间</span>
           <strong>
@@ -119,7 +130,9 @@
             {{ selectedSchedule?.timeRange }}
           </strong>
         </div>
-        <div class="summary__row"><span>被照顾人</span><strong>{{ selectedReceiver?.name }}</strong></div>
+        <div class="summary__row">
+          <span>被照顾人</span><strong>{{ selectedReceiver?.name }}</strong>
+        </div>
         <div class="summary__row summary__row--total">
           <span>应付金额</span>
           <strong>¥{{ selectedSchedule?.price }}</strong>

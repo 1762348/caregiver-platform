@@ -52,10 +52,7 @@ export interface CancelResult {
   feeApplied: boolean
 }
 
-export function createOrder(payload: {
-  scheduleId: number
-  receiverId: number
-}): Promise<Order> {
+export function createOrder(payload: { scheduleId: number; receiverId: number }): Promise<Order> {
   return request<Order>({ url: '/v1/orders', method: 'post', data: payload })
 }
 

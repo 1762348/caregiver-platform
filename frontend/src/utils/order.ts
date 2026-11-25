@@ -19,7 +19,9 @@ export const STAGE_LABELS: Record<OrderStage, string> = {
 }
 
 /** 状态对应的展示颜色（Vant tag / 自定义 pill 共用） */
-export function statusTone(status: OrderStatus): 'warning' | 'primary' | 'success' | 'default' | 'danger' {
+export function statusTone(
+  status: OrderStatus,
+): 'warning' | 'primary' | 'success' | 'default' | 'danger' {
   switch (status) {
     case 'PENDING_PAYMENT':
       return 'warning'
@@ -50,10 +52,34 @@ export function progressSteps(order: {
   completedAt: string | null
 }): ProgressStep[] {
   const steps: ProgressStep[] = [
-    { key: 'departed', label: '护工出发', time: order.departedAt, done: !!order.departedAt, active: false },
-    { key: 'arrived', label: '到达服务地点', time: order.arrivedAt, done: !!order.arrivedAt, active: false },
-    { key: 'started', label: '开始服务', time: order.startedAt, done: !!order.startedAt, active: false },
-    { key: 'completed', label: '服务完成', time: order.completedAt, done: !!order.completedAt, active: false },
+    {
+      key: 'departed',
+      label: '护工出发',
+      time: order.departedAt,
+      done: !!order.departedAt,
+      active: false,
+    },
+    {
+      key: 'arrived',
+      label: '到达服务地点',
+      time: order.arrivedAt,
+      done: !!order.arrivedAt,
+      active: false,
+    },
+    {
+      key: 'started',
+      label: '开始服务',
+      time: order.startedAt,
+      done: !!order.startedAt,
+      active: false,
+    },
+    {
+      key: 'completed',
+      label: '服务完成',
+      time: order.completedAt,
+      done: !!order.completedAt,
+      active: false,
+    },
   ]
   const firstPending = steps.findIndex((step) => !step.done)
   if (firstPending >= 0) {
@@ -76,7 +102,10 @@ export function formatDateTime(value: string | null | undefined): string {
   return value.replace('T', ' ').slice(0, 16)
 }
 
-/** 生成未来 N 天的日期选项（YYYY-MM-DD） */export function nextDays(count: number, from = new Date()): Array<{ value: string; label: string }> {
+/** 生成未来 N 天的日期选项（YYYY-MM-DD） */ export function nextDays(
+  count: number,
+  from = new Date(),
+): Array<{ value: string; label: string }> {
   const result: Array<{ value: string; label: string }> = []
   for (let i = 0; i < count; i++) {
     const date = new Date(from.getFullYear(), from.getMonth(), from.getDate() + i)

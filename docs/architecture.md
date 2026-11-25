@@ -92,6 +92,15 @@ com.youhu.caregiver
 与设计文档的差异（时段拆分、枚举编码、身份证派生字段等）统一记录在
 [设计决策记录](design-decisions.md)，避免“文档与实现两张皮”。
 
+## 质量保障
+
+- **后端**：JUnit 5 + MockMvc + H2（MySQL 兼容模式），Flyway 迁移在测试中真实执行，`ddl-auto=validate` 保证实体与表结构一致
+- **覆盖率**：JaCoCo 生成报告并在 `verify` 阶段设卡（行 ≥65%、分支 ≥40%），CI 上传报告产物
+- **并发正确性**：抢名额、停班退款等关键路径有专门的集成/并发测试
+- **前端**：`vue-tsc` 类型检查、ESLint（flat config）、Prettier、Vitest（工具/store/组件）
+- **接口文档**：springdoc 自动生成 OpenAPI，Swagger UI 与代码保持同步
+- **CI**：后端 `mvn verify`、前端 `lint → format:check → test → build`，任一失败即阻断合并
+
 ## 环境与配置
 
 | 环境 | Profile | 数据库 | 用途 |

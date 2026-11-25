@@ -1,5 +1,8 @@
 # 接口文档
 
+> 在线调试：启动后端后访问 <http://localhost:8080/swagger-ui.html>（OpenAPI JSON：`/v3/api-docs`）。
+> 先调用 `/api/v1/auth/sms-code` 与 `/api/v1/auth/login` 获取 token，再点右上角 Authorize 填入。
+
 - Base URL：`http://localhost:8080`
 - 统一前缀：`/api/v1`
 - 内容类型：`application/json; charset=utf-8`
@@ -300,4 +303,4 @@
 
 ## 待补充
 
-- OpenAPI（Swagger UI）：P6 接入后自动生成
+- 真实支付/短信渠道接入（需商户资质与服务商账号）

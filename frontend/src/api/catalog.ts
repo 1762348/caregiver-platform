@@ -49,10 +49,7 @@ export function fetchCategories(): Promise<Category[]> {
   return request<Category[]>({ url: '/v1/categories' })
 }
 
-export function fetchSchedules(params: {
-  date: string
-  categoryId?: number
-}): Promise<Schedule[]> {
+export function fetchSchedules(params: { date: string; categoryId?: number }): Promise<Schedule[]> {
   return request<Schedule[]>({ url: '/v1/schedules', params })
 }
 

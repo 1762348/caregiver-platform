@@ -43,13 +43,7 @@
         </van-cell-group>
 
         <div class="login__actions">
-          <van-button
-            block
-            round
-            type="primary"
-            native-type="submit"
-            :loading="submitting"
-          >
+          <van-button block round type="primary" native-type="submit" :loading="submitting">
             登录 / 注册
           </van-button>
           <router-link class="login__back" to="/">先随便看看</router-link>
@@ -90,9 +84,7 @@ const submitting = ref(false)
 let timer: ReturnType<typeof setInterval> | undefined
 
 const counting = computed(() => seconds.value > 0)
-const codeButtonText = computed(() =>
-  counting.value ? `${seconds.value}s 后重发` : '获取验证码',
-)
+const codeButtonText = computed(() => (counting.value ? `${seconds.value}s 后重发` : '获取验证码'))
 
 const phoneRules = [
   { required: true, message: '请输入手机号' },
@@ -137,8 +129,7 @@ async function onSubmit() {
   try {
     await auth.login(phone.value, code.value)
     showToast('登录成功')
-    const redirect =
-      typeof route.query.redirect === 'string' ? route.query.redirect : auth.homePath
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : auth.homePath
     await router.replace(redirect)
   } catch (error) {
     showToast(error instanceof Error ? error.message : '登录失败')
@@ -161,8 +152,7 @@ onBeforeUnmount(() => {
   min-height: 100vh;
   padding: 32px 20px 40px;
   background:
-    radial-gradient(120% 60% at 50% 0%, #cffafe 0%, rgba(207, 250, 254, 0) 70%),
-    var(--yh-bg);
+    radial-gradient(120% 60% at 50% 0%, #cffafe 0%, rgba(207, 250, 254, 0) 70%), var(--yh-bg);
 }
 
 .login__brand {

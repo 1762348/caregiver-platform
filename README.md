@@ -33,7 +33,7 @@
 
 ## 当前进度
 
-> 正在按阶段推进：**P0–P5 已完成**（基建、数据层、认证、核心业务、用户端、护工端与管理端），接下来是测试补齐与部署发布。
+> 正在按阶段推进：**P0–P6 已完成**（基建、数据层、认证、核心业务、三端页面、测试与质量），只剩部署发布。
 
 | 阶段 | 内容 | 状态 |
 | --- | --- | --- |
@@ -43,6 +43,7 @@
 | P3 | 核心业务：排班查询、预约、支付、取消退款、服务进度、消息 | ✅ |
 | P4 | 用户端页面：预约向导、支付、订单、进度、被照顾人、消息 | ✅ |
 | P5 | 护工工作台 + 管理后台（类别、护工、排班、名额、停班） | ✅ |
+| P6 | 测试与质量：58 个后端测试、17 个前端测试、覆盖率门槛、OpenAPI、ESLint/Prettier | ✅ |
 | P4 | 用户端完整页面 | ⬜ |
 | P5 | 护工端 + 管理后台 | ⬜ |
 | P6 | 测试补齐、覆盖率、E2E | ⬜ |
@@ -54,11 +55,11 @@
 
 | 层 | 选型 |
 | --- | --- |
-| 后端 | Java 17 · Spring Boot 4 · Spring Data JPA · Spring Security + JWT · Flyway · Bean Validation |
+| 后端 | Java 17 · Spring Boot 4 · Spring Data JPA · Spring Security + JWT · Flyway · Bean Validation · springdoc |
 | 数据库 | MySQL 8（开发/生产）· H2 MySQL 模式（测试） |
-| 前端 | Vue 3 · TypeScript · Vite · Pinia · Vue Router · Vant 4 · Axios |
-| 测试 | JUnit 5 · Mockito · MockMvc · Vitest |
-| 工程化 | Maven · npm · GitHub Actions · Docker Compose（P7） |
+| 前端 | Vue 3 · TypeScript · Vite · Pinia · Vue Router · Vant 4 · Element Plus · Axios |
+| 测试 | JUnit 5 · Mockito · MockMvc · H2 · JaCoCo · Vitest · @vue/test-utils |
+| 工程化 | Maven · npm · ESLint · Prettier · GitHub Actions · Docker Compose（P7） |
 
 ## 目录结构
 
@@ -121,6 +122,8 @@ curl http://localhost:8080/api/v1/meta
 ```
 
 健康检查：<http://localhost:8080/actuator/health>
+接口文档（Swagger UI）：<http://localhost:8080/swagger-ui.html>
+OpenAPI JSON：<http://localhost:8080/v3/api-docs>
 
 ### 3. 演示账号
 
@@ -147,9 +150,13 @@ npm run dev
 ### 4. 运行测试
 
 ```bash
-cd backend && ./mvnw verify          # JUnit（H2，无需 MySQL）
+cd backend && ./mvnw verify          # JUnit（H2，无需 MySQL）+ JaCoCo 覆盖率门槛
 cd frontend && npm run test:unit     # Vitest
+cd frontend && npm run lint          # ESLint
+cd frontend && npm run format:check  # Prettier
 ```
+
+覆盖率报告：`backend/target/site/jacoco/index.html`；测试策略与手工验收清单见 [测试与质量](docs/testing.md)。
 
 ## 配置说明
 
@@ -167,12 +174,12 @@ cd frontend && npm run test:unit     # Vitest
 
 ## 文档
 
-- [接口文档](docs/api.md)
+- [接口文档](docs/api.md)（Swagger UI：启动后访问 `/swagger-ui.html`）
 - [架构说明](docs/architecture.md)
 - [数据库说明与 ER 图](docs/database.md)
+- [测试与质量](docs/testing.md)
 - [设计决策记录](docs/design-decisions.md)
 - [开发路线图](docs/roadmap.md)
-- OpenAPI（Swagger UI）：P6 接入 springdoc 后提供 `/swagger-ui.html`
 
 ## 说明与边界
 

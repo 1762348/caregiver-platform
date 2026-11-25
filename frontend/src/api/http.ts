@@ -35,9 +35,7 @@ http.interceptors.response.use(
     if (status === 401) {
       localStorage.removeItem(TOKEN_KEY)
       if (!window.location.pathname.startsWith('/login')) {
-        const redirect = encodeURIComponent(
-          window.location.pathname + window.location.search,
-        )
+        const redirect = encodeURIComponent(window.location.pathname + window.location.search)
         window.location.assign(`/login?redirect=${redirect}`)
       }
     }

@@ -49,19 +49,49 @@
       <section class="card">
         <h3 class="card__title">服务信息</h3>
         <dl class="info-list">
-          <div><dt>服务类别</dt><dd>{{ order.categoryName || '-' }}</dd></div>
-          <div><dt>护工</dt><dd>{{ order.caregiverName || '-' }}</dd></div>
-          <div><dt>服务时间</dt><dd>{{ formatDateLabel(order.serviceDate) }} {{ order.serviceTime }}</dd></div>
-          <div><dt>被照顾人</dt><dd>{{ order.receiverName || '-' }}</dd></div>
-          <div><dt>订单金额</dt><dd class="amount">¥{{ order.amount }}</dd></div>
-          <div><dt>下单时间</dt><dd>{{ formatDateTime(order.createdAt) }}</dd></div>
-          <div v-if="order.payTime"><dt>支付时间</dt><dd>{{ formatDateTime(order.payTime) }}</dd></div>
-          <div v-if="order.cancelTime"><dt>取消时间</dt><dd>{{ formatDateTime(order.cancelTime) }}</dd></div>
-          <div v-if="order.cancelReason"><dt>取消原因</dt><dd>{{ order.cancelReason }}</dd></div>
+          <div>
+            <dt>服务类别</dt>
+            <dd>{{ order.categoryName || '-' }}</dd>
+          </div>
+          <div>
+            <dt>护工</dt>
+            <dd>{{ order.caregiverName || '-' }}</dd>
+          </div>
+          <div>
+            <dt>服务时间</dt>
+            <dd>{{ formatDateLabel(order.serviceDate) }} {{ order.serviceTime }}</dd>
+          </div>
+          <div>
+            <dt>被照顾人</dt>
+            <dd>{{ order.receiverName || '-' }}</dd>
+          </div>
+          <div>
+            <dt>订单金额</dt>
+            <dd class="amount">¥{{ order.amount }}</dd>
+          </div>
+          <div>
+            <dt>下单时间</dt>
+            <dd>{{ formatDateTime(order.createdAt) }}</dd>
+          </div>
+          <div v-if="order.payTime">
+            <dt>支付时间</dt>
+            <dd>{{ formatDateTime(order.payTime) }}</dd>
+          </div>
+          <div v-if="order.cancelTime">
+            <dt>取消时间</dt>
+            <dd>{{ formatDateTime(order.cancelTime) }}</dd>
+          </div>
+          <div v-if="order.cancelReason">
+            <dt>取消原因</dt>
+            <dd>{{ order.cancelReason }}</dd>
+          </div>
         </dl>
       </section>
 
-      <section v-if="order.caregiverPhone && order.status !== 'CANCELLED'" class="card contact-card">
+      <section
+        v-if="order.caregiverPhone && order.status !== 'CANCELLED'"
+        class="card contact-card"
+      >
         <div>
           <strong>联系护工</strong>
           <p class="text-muted">{{ order.caregiverName }} · {{ order.caregiverPhone }}</p>
@@ -81,7 +111,9 @@
       </section>
 
       <section v-else-if="order.status === 'COMPLETED'" class="actions">
-        <van-button block round type="primary" @click="router.push('/booking')">再次预约</van-button>
+        <van-button block round type="primary" @click="router.push('/booking')"
+          >再次预约</van-button
+        >
       </section>
 
       <p class="rule-note">
@@ -105,13 +137,7 @@ import { showConfirmDialog, showToast } from 'vant'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import {
-  cancelOrder,
-  fetchOrder,
-  payOrder,
-  type Order,
-  type PaymentChannel,
-} from '@/api/orders'
+import { cancelOrder, fetchOrder, payOrder, type Order, type PaymentChannel } from '@/api/orders'
 import {
   STAGE_LABELS,
   STATUS_LABELS,
@@ -135,9 +161,7 @@ const payActions = [
 
 const steps = computed(() => (order.value ? progressSteps(order.value) : []))
 const showProgress = computed(
-  () =>
-    order.value !== null &&
-    ['PAID', 'IN_SERVICE', 'COMPLETED'].includes(order.value.status),
+  () => order.value !== null && ['PAID', 'IN_SERVICE', 'COMPLETED'].includes(order.value.status),
 )
 
 const stageHint = computed(() => {
@@ -214,8 +238,7 @@ async function confirmCancel() {
   try {
     await showConfirmDialog({
       title: '取消订单',
-      message:
-        '服务开始前 2 小时以上可全额退款；2 小时内取消收取 20% 手续费。确定取消吗？',
+      message: '服务开始前 2 小时以上可全额退款；2 小时内取消收取 20% 手续费。确定取消吗？',
       confirmButtonText: '确认取消',
       cancelButtonText: '再想想',
     })
@@ -224,11 +247,7 @@ async function confirmCancel() {
   }
   try {
     const result = await cancelOrder(order.value.id, '用户取消')
-    showToast(
-      result.refundAmount > 0
-        ? `已取消，退款 ¥${result.refundAmount}`
-        : '订单已取消',
-    )
+    showToast(result.refundAmount > 0 ? `已取消，退款 ¥${result.refundAmount}` : '订单已取消')
     await load()
   } catch (error) {
     showToast(error instanceof Error ? error.message : '取消失败')

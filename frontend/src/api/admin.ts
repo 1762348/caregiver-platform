@@ -113,10 +113,7 @@ export function createCaregiver(payload: CaregiverPayload): Promise<AdminCaregiv
   return request<AdminCaregiver>({ url: '/v1/admin/caregivers', method: 'post', data: payload })
 }
 
-export function updateCaregiver(
-  id: number,
-  payload: CaregiverPayload,
-): Promise<AdminCaregiver> {
+export function updateCaregiver(id: number, payload: CaregiverPayload): Promise<AdminCaregiver> {
   return request<AdminCaregiver>({
     url: `/v1/admin/caregivers/${id}`,
     method: 'put',
@@ -124,10 +121,7 @@ export function updateCaregiver(
   })
 }
 
-export function updateCaregiverStatus(
-  id: number,
-  status: RecordStatus,
-): Promise<AdminCaregiver> {
+export function updateCaregiverStatus(id: number, status: RecordStatus): Promise<AdminCaregiver> {
   return request<AdminCaregiver>({
     url: `/v1/admin/caregivers/${id}/status`,
     method: 'post',
@@ -163,10 +157,7 @@ export function createSchedule(payload: SchedulePayload): Promise<AdminSchedule>
   return request<AdminSchedule>({ url: '/v1/admin/schedules', method: 'post', data: payload })
 }
 
-export function updateSchedule(
-  id: number,
-  payload: SchedulePayload,
-): Promise<AdminSchedule> {
+export function updateSchedule(id: number, payload: SchedulePayload): Promise<AdminSchedule> {
   return request<AdminSchedule>({
     url: `/v1/admin/schedules/${id}`,
     method: 'put',

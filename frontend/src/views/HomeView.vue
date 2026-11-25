@@ -3,7 +3,9 @@
     <header class="home__header">
       <div>
         <p class="home__eyebrow">优护 · 社区护工</p>
-        <h1 class="home__title">{{ greeting }}{{ auth.user?.name ? '，' + auth.user.name : '，您好' }}</h1>
+        <h1 class="home__title">
+          {{ greeting }}{{ auth.user?.name ? '，' + auth.user.name : '，您好' }}
+        </h1>
         <p class="home__subtitle">
           {{
             auth.isLoggedIn
