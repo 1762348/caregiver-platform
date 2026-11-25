@@ -2,7 +2,7 @@
 
 > 连接需要护工服务的家庭与专业护工：查排班、约护工、在线支付、跟踪上门服务进度。
 
-[![CI](https://github.com/ZhuanZ1/caregiver-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/ZhuanZ1/caregiver-platform/actions/workflows/ci.yml)
+[![CI](https://github.com/1762348/caregiver-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/1762348/caregiver-platform/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://adoptium.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
