@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全问题
+    url: https://github.com/1762348/caregiver-platform/security/advisories/new
+    about: 请通过私密安全通告报告漏洞，不要公开 Issue
+  - name: 部署与使用问题
+    url: https://github.com/1762348/caregiver-platform/blob/main/docs/deployment.md
+    about: 先查看部署指南与故障排查

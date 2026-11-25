@@ -1,0 +1,53 @@
+name: Bug 报告
+description: 报告一个可复现的问题
+title: '[Bug] '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请先确认已阅读 README 与部署文档，并搜索过现有 Issue。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述
+      description: 发生了什么？期望的结果是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 使用账号 ...
+        2. 打开页面 ...
+        3. 点击 ...
+        4. 看到错误 ...
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: 影响模块
+      options:
+        - 登录 / 认证
+        - 预约 / 订单
+        - 支付 / 退款
+        - 服务进度
+        - 被照顾人
+        - 护工工作台
+        - 管理后台
+        - 部署 / 配置
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 运行环境
+      placeholder: 例如 Windows 11 / JDK 17 / MySQL 8.0 / Chrome 131
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志或截图
+      description: 后端日志、浏览器控制台、接口响应等（请先脱敏）
