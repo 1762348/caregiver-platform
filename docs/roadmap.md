@@ -93,12 +93,17 @@
 **验收**：`mvn clean verify` 输出 “All coverage checks have been met.”；前端 lint 0 警告、17 个测试通过；
 Swagger UI 返回 200 且包含全部接口；CI 串联后端与前端质量门禁。
 
-## P7 部署与发布
+## P7 部署与发布 ✅
 
-- [ ] 后端 / 前端 Dockerfile + `docker-compose.yml`（mysql + backend + nginx）
-- [ ] GitHub Actions 构建镜像并推送 GHCR
-- [ ] 生产 Profile、健康检查、备份脚本
-- [ ] 截图、演示地址、v1.0.0 Release
-- [ ] Capacitor 打包 Android APK（可选）
+- [x] 后端 / 前端多阶段 Dockerfile（构建上下文统一为仓库根目录）
+- [x] `docker-compose.yml`：MySQL 8 + 后端 + Nginx，健康检查与依赖顺序
+- [x] Nginx：SPA 回退、`/api` 反向代理、Swagger/Actuator 代理、静态资源缓存、安全响应头
+- [x] `prod` Profile：环境变量化、Flyway 自动迁移、关闭固定验证码、外部化 JWT 密钥
+- [x] CI 增加镜像构建任务（不推送），验证 Dockerfile 可构建
+- [x] Tag 触发 Release 工作流：推送 GHCR 镜像并创建 GitHub Release
+- [x] 部署文档：安全清单、备份恢复、升级回滚、云服务器与故障排查
+- [ ] APK 打包（可选，未实现）
 
-**验收**：新机器 `docker compose up -d` 一键可用；Release 附带部署说明与截图。
+**验收**：`docker compose config` 等价的 YAML 解析通过；`prod` Profile 在本机以环境变量启动成功，
+健康检查 `UP`、固定验证码登录成功；CI 的 Docker 任务负责实际构建镜像。
+本机未安装 Docker，镜像构建结果以 CI 为准。

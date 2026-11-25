@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 5000
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+  shutdown: graceful
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: caregiver-platform
+    expires-minutes: ${JWT_EXPIRE_MINUTES:10080}
+  sms:
+    provider: mock
+    # 生产环境必须为空（随机验证码，输出到日志）；仅演示部署可临时设置固定值
+    fixed-code: ${SMS_FIXED_CODE:}
+    ttl-seconds: 300
+    resend-interval-seconds: 60
+    max-attempts: 5
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost}
+  payment:
+    mock-secret: ${MOCK_PAYMENT_SECRET:change-me}
+
+logging:
+  level:
+    root: info
+    com.youhu.caregiver: info

@@ -31,7 +31,7 @@ public class MetaController {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("name", applicationName);
         body.put("displayName", "优护 · 社区护工预约平台");
-        body.put("version", "0.1.0");
+        body.put("version", "1.0.0");
         body.put("profile", String.join(",", environment.getActiveProfiles()));
         body.put("serverTime", OffsetDateTime.now().toString());
         return ApiResponse.ok(body);

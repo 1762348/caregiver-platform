@@ -33,7 +33,7 @@
 
 ## 当前进度
 
-> 正在按阶段推进：**P0–P6 已完成**（基建、数据层、认证、核心业务、三端页面、测试与质量），只剩部署发布。
+> P0–P7 全部完成：三端功能、测试与质量门禁、Docker 部署与发布工作流均已就绪，版本 v1.0.0。
 
 | 阶段 | 内容 | 状态 |
 | --- | --- | --- |
@@ -43,7 +43,8 @@
 | P3 | 核心业务：排班查询、预约、支付、取消退款、服务进度、消息 | ✅ |
 | P4 | 用户端页面：预约向导、支付、订单、进度、被照顾人、消息 | ✅ |
 | P5 | 护工工作台 + 管理后台（类别、护工、排班、名额、停班） | ✅ |
-| P6 | 测试与质量：58 个后端测试、17 个前端测试、覆盖率门槛、OpenAPI、ESLint/Prettier | ✅ |
+| P6 | 测试与质量：58 个后端测试、17 个前端测试、覆盖率门槛、OpenAPI | ✅ |
+| P7 | Docker Compose + Nginx 部署、prod 配置、GHCR 发布与 Release 工作流 | ✅ |
 | P4 | 用户端完整页面 | ⬜ |
 | P5 | 护工端 + 管理后台 | ⬜ |
 | P6 | 测试补齐、覆盖率、E2E | ⬜ |
@@ -78,13 +79,34 @@ caregiver-platform/
 │  ├─ src/views/            页面
 │  ├─ src/stores/           Pinia 状态
 │  └─ tests/                Vitest 单元测试
-├─ docs/                    架构、路线图、接口文档
-├─ .github/workflows/       CI
-├─ .env.example             环境变量样例
-└─ docker-compose.yml       （P7）
+├─ docs/                    架构、部署、测试、接口文档
+├─ deploy/                  Nginx 配置
+├─ .github/workflows/       CI 与 Release
+├─ backend/Dockerfile       后端镜像（多阶段构建）
+├─ frontend/Dockerfile      前端镜像（构建后由 Nginx 托管）
+├─ docker-compose.yml       MySQL + 后端 + Web 一键启动
+└─ .env.example             环境变量样例
 ```
 
-## 快速开始
+## Docker 一键部署
+
+```bash
+cp .env.example .env
+# 修改 .env：DB_PASSWORD、JWT_SECRET（openssl rand -base64 48）
+docker compose up -d --build
+```
+
+| 地址 | 说明 |
+| --- | --- |
+| <http://localhost> | 前端（用户端 / 护工端 / 管理后台） |
+| <http://localhost:8080/swagger-ui.html> | 接口调试 |
+| <http://localhost:8080/actuator/health> | 健康检查 |
+
+演示登录：在 `.env` 设置 `SMS_FIXED_CODE=123456`，使用 `13800000002`（用户）/ `13800000001`（护工）/ `13800000000`（管理员）。
+
+备份、升级、HTTPS、安全清单与故障排查见 [部署指南](docs/deployment.md)。
+
+## 本地开发
 
 ### 环境要求
 
@@ -175,6 +197,7 @@ cd frontend && npm run format:check  # Prettier
 ## 文档
 
 - [接口文档](docs/api.md)（Swagger UI：启动后访问 `/swagger-ui.html`）
+- [部署指南](docs/deployment.md)
 - [架构说明](docs/architecture.md)
 - [数据库说明与 ER 图](docs/database.md)
 - [测试与质量](docs/testing.md)

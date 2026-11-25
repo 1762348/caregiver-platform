@@ -43,7 +43,7 @@
 
     <div class="profile__footer">
       <van-button block round plain type="danger" @click="logout">退出登录</van-button>
-      <p>优护 · 社区护工预约平台 v0.1.0</p>
+      <p>优护 · 社区护工预约平台 v1.0.0</p>
     </div>
   </div>
 </template>
@@ -76,7 +76,7 @@ function openMenu(item: { title: string; to: string }) {
   if (item.to) {
     router.push(item.to)
   } else {
-    showToast('优护 · 社区护工预约平台 v0.1.0')
+    showToast('优护 · 社区护工预约平台 v1.0.0')
   }
 }
 

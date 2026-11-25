@@ -107,7 +107,7 @@ com.youhu.caregiver
 | --- | --- | --- | --- |
 | 本地开发 | `dev` | MySQL 8 | 联调 |
 | 自动化测试 | `test` | H2（MySQL 模式） | CI，无外部依赖 |
-| 生产 | `prod`（P7） | MySQL 8 | 容器部署 |
+| 生产 | `prod` | MySQL 8 | Docker Compose，环境变量注入密钥 |
 
 ## 非目标
 

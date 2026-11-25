@@ -12,7 +12,7 @@
 
     <groupId>com.youhu</groupId>
     <artifactId>caregiver-platform</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>caregiver-platform</name>
     <description>优护 · 社区护工预约平台（后端）</description>
 

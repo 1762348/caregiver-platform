@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+**/node_modules
+**/target
+**/dist
+**/.vite
+docs
+temp
+*.md
+*.log
